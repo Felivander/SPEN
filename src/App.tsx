@@ -214,16 +214,16 @@ export default function App() {
         tab={tab}
         onScopeChange={handleScopeChange}
         onTabChange={setTab}
-        monthName={monthLabel(anchor)}
+        selectedNet={visibleNet}
+        currency={settings.currency}
+        locale={settings.locale}
       />
 
-      <div className="summary">
-        <span
-          className={`summary__net${visibleNet > 0 ? ' summary__net--positive' : ''}`}
-        >
-          {formatMoney(visibleNet, settings.currency, settings.locale)}
-        </span>
-      </div>
+      {tab !== 'hoy' && (
+        <div className="summary">
+          <span className="summary__period">{monthLabel(anchor)}</span>
+        </div>
+      )}
 
       <main className="list">
         <MovementList
