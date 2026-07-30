@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { formatMoney } from '../lib/format'
 
-const DOT_COUNT = 10
+const DOT_COUNT = 5
 
 interface Props {
   balance: number
