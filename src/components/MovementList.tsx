@@ -1,0 +1,108 @@
+import { useState } from 'react'
+import { formatSigned } from '../lib/format'
+import { fromISODate, MONTHS, timeLabel, todayISO, WEEKDAYS, weekdayIndex } from '../lib/dates'
+import type { Movement } from '../types'
+
+interface Props {
+  movements: Movement[]
+  /** When the view already covers a single day, the day headings are noise. */
+  groupByDay: boolean
+  currency: string
+  locale: string
+  onDelete: (id: string) => void
+}
+
+function dayHeading(iso: string): string {
+  if (iso === todayISO()) return 'hoy'
+  const d = fromISODate(iso)
+  return `${WEEKDAYS[weekdayIndex(d)]} ${d.getDate()} ${MONTHS[d.getMonth()].slice(0, 3)}`
+}
+
+export function MovementList({ movements, groupByDay, currency, locale, onDelete }: Props) {
+  const [openId, setOpenId] = useState<string | null>(null)
+
+  if (movements.length === 0) {
+    return (
+      <div className="empty">
+        <p className="empty__title">Nada por acá todavía.</p>
+        <p className="empty__hint">
+          Contale a la app lo que gastaste o cobraste y se anota solo.
+        </p>
+        <p className="empty__example">café 1.200</p>
+      </div>
+    )
+  }
+
+  // Newest first, then by capture time so same-day entries keep their order.
+  const sorted = [...movements].sort(
+    (a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt,
+  )
+
+  const groups: { date: string; items: Movement[] }[] = []
+  for (const m of sorted) {
+    const key = groupByDay ? m.date : '__all__'
+    const last = groups.at(-1)
+    if (last && last.date === key) last.items.push(m)
+    else groups.push({ date: key, items: [m] })
+  }
+
+  return (
+    <div>
+      {groups.map((group) => (
+        <section key={group.date}>
+          {groupByDay && <h2 className="list__daylabel">{dayHeading(group.date)}</h2>}
+
+          {group.items.map((m) => {
+            const isOpen = openId === m.id
+            return (
+              <div key={m.id} className="row">
+                <button
+                  type="button"
+                  className="row__main"
+                  aria-expanded={isOpen}
+                  aria-label={`${m.description}, ${m.category}, ${formatSigned(
+                    m.amount,
+                    m.kind,
+                    currency,
+                    locale,
+                  )}`}
+                  onClick={() => setOpenId(isOpen ? null : m.id)}
+                >
+                  <span className="row__text">
+                    <span className="row__desc" title={m.description}>
+                      {m.description}
+                    </span>
+                    <span className="row__meta">
+                      {m.category}
+                      {groupByDay ? ` · ${timeLabel(m.createdAt)}` : ''}
+                    </span>
+                  </span>
+                  <span
+                    className={`row__amount${m.kind === 'ingreso' ? ' row__amount--in' : ''}`}
+                  >
+                    {formatSigned(m.amount, m.kind, currency, locale)}
+                  </span>
+                </button>
+
+                {isOpen && (
+                  <div className="row__actions">
+                    <button
+                      type="button"
+                      className="row__delete"
+                      onClick={() => {
+                        onDelete(m.id)
+                        setOpenId(null)
+                      }}
+                    >
+                      Borrar
+                    </button>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </section>
+      ))}
+    </div>
+  )
+}
