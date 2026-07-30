@@ -27,7 +27,7 @@ export const KEYWORDS: Record<Category, string[]> = {
     'asado', 'vino', 'cerveza', 'merienda', 'fiambreria', 'fiambrería',
     'dietetica', 'dietética', 'pescaderia', 'pescadería', 'sushi', 'parrilla',
     'cafeteria', 'cafetería', 'pedidosya', 'pedidos ya', 'starbucks', 'mcdonalds',
-    'burger', 'milanesa', 'facturas', 'picada', 'gaseosa',
+    'burger', 'hamburguesa', 'hamburguesas', 'lomito', 'sandwich', 'sanguche', 'milanesa', 'facturas', 'picada', 'gaseosa', 'mostaza', 'pancho',
     // Cadenas de supermercado — sin esto caían todas en "Otros".
     // Se omiten a propósito "Día", "Vea" y "Disco": son palabras demasiado
     // comunes y arrastrarían frases que no hablan de un supermercado.
