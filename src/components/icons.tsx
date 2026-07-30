@@ -90,15 +90,15 @@ export function HistoryIcon({ size = 20, strokeWidth = 2 }: IconProps) {
     <svg
       width={size}
       height={size}
-      viewBox="0 0 20 20"
+      viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
       strokeWidth={strokeWidth}
       strokeLinecap="round"
       aria-hidden="true"
     >
-      <line x1="3" y1="7" x2="17" y2="7" />
-      <line x1="3" y1="13" x2="17" y2="13" />
+      <line x1="3" y1="9" x2="21" y2="9" />
+      <line x1="3" y1="15" x2="21" y2="15" />
     </svg>
   )
 }
