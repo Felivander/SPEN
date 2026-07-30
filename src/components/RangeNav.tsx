@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { WEEKDAYS } from '../lib/dates'
 import { formatMoney } from '../lib/format'
 import type { Scope, Tab } from '../types'
-import { CheckIcon, ChevronLeft, ChevronRight } from './icons'
+import { CheckIcon } from './icons'
 
 const SCOPES: { value: Scope; label: string }[] = [
   { value: 'mes', label: 'Mes' },

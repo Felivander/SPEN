@@ -141,15 +141,6 @@ export default function App() {
     return `${shortDate(iso(start))} – ${shortDate(iso(end))}`
   }, [scope, tab, anchor])
 
-  /** Don't let the user page into empty future periods. */
-  const canStepForward = useMemo(() => {
-    const now = new Date()
-    return scope === 'mes'
-      ? anchor.getFullYear() < now.getFullYear() ||
-          (anchor.getFullYear() === now.getFullYear() && anchor.getMonth() < now.getMonth())
-      : startOfWeek(anchor).getTime() < startOfWeek(now).getTime()
-  }, [scope, anchor])
-
   /* ------------------------------------------------------------ actions -- */
 
   const handleScopeChange = useCallback((next: Scope) => {
@@ -158,20 +149,6 @@ export default function App() {
     // Week scope opens on today's weekday; month scope opens on the whole month.
     setTab(next === 'semana' ? weekdayIndex(new Date()) : 'periodo')
   }, [])
-
-  const handleStep = useCallback(
-    (delta: -1 | 1) => {
-      setAnchor((prev) => {
-        if (scope === 'mes') {
-          return new Date(prev.getFullYear(), prev.getMonth() + delta, 1)
-        }
-        return addDays(prev, delta * 7)
-      })
-      // "hoy" is meaningless once you leave the current period.
-      setTab((prev) => (prev === 'hoy' ? 'periodo' : prev))
-    },
-    [scope],
-  )
 
   const handleSubmit = useCallback(
     async (text: string) => {
