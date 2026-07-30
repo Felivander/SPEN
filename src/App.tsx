@@ -82,6 +82,19 @@ export default function App() {
     return movements.filter((m) => isSameMonth(m.date, now))
   }, [movements])
 
+  const todayNet = useMemo(
+    () => movements
+      .filter((m) => m.date === today)
+      .reduce((sum, m) => sum + (m.kind === 'ingreso' ? m.amount : -m.amount), 0),
+    [movements, today],
+  )
+
+  const monthNet = useMemo(
+    () => movementsThisMonth
+      .reduce((sum, m) => sum + (m.kind === 'ingreso' ? m.amount : -m.amount), 0),
+    [movementsThisMonth],
+  )
+
   /** The movements the current scope + tab selects. */
   const visible = useMemo(() => {
     const inScope = movements.filter((m) =>
@@ -260,8 +273,10 @@ export default function App() {
         tab={tab}
         onScopeChange={handleScopeChange}
         onTabChange={setTab}
-        onStep={handleStep}
-        canStepForward={canStepForward}
+        todayNet={todayNet}
+        monthNet={monthNet}
+        currency={settings.currency}
+        locale={settings.locale}
       />
 
       <div className="summary">

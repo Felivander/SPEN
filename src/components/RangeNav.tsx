@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { WEEKDAYS } from '../lib/dates'
+import { formatMoney } from '../lib/format'
 import type { Scope, Tab } from '../types'
 import { CheckIcon, ChevronLeft, ChevronRight } from './icons'
 
@@ -13,8 +14,10 @@ interface Props {
   tab: Tab
   onScopeChange: (scope: Scope) => void
   onTabChange: (tab: Tab) => void
-  onStep: (delta: -1 | 1) => void
-  canStepForward: boolean
+  todayNet: number
+  monthNet: number
+  currency: string
+  locale: string
 }
 
 /**
@@ -30,8 +33,10 @@ export function RangeNav({
   tab,
   onScopeChange,
   onTabChange,
-  onStep,
-  canStepForward,
+  todayNet,
+  monthNet,
+  currency,
+  locale,
 }: Props) {
   const [open, setOpen] = useState(false)
   const anchorRef = useRef<HTMLDivElement>(null)
@@ -133,24 +138,19 @@ export function RangeNav({
         )}
       </div>
 
-      <div className="nav__steps">
-        <button
-          type="button"
-          className="step-btn"
-          onClick={() => onStep(-1)}
-          aria-label={scope === 'mes' ? 'Mes anterior' : 'Semana anterior'}
-        >
-          <ChevronLeft />
-        </button>
-        <button
-          type="button"
-          className="step-btn"
-          onClick={() => onStep(1)}
-          disabled={!canStepForward}
-          aria-label={scope === 'mes' ? 'Mes siguiente' : 'Semana siguiente'}
-        >
-          <ChevronRight />
-        </button>
+      <div className="nav__stats">
+        <div className="nav__stat">
+          <span className="nav__stat-label">hoy</span>
+          <span className={`nav__stat-value${todayNet > 0 ? ' nav__stat-value--pos' : ''}`}>
+            {formatMoney(todayNet, currency, locale)}
+          </span>
+        </div>
+        <div className="nav__stat">
+          <span className="nav__stat-label">mes</span>
+          <span className={`nav__stat-value${monthNet > 0 ? ' nav__stat-value--pos' : ''}`}>
+            {formatMoney(monthNet, currency, locale)}
+          </span>
+        </div>
       </div>
     </nav>
   )

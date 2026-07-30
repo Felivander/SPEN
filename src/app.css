@@ -195,6 +195,42 @@
   opacity: 0.3;
 }
 
+/* Mini stats replacing the nav arrows */
+.nav__stats {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-inline-start: auto;
+}
+
+.nav__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.05rem;
+}
+
+.nav__stat-label {
+  font-size: var(--text-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  line-height: 1;
+}
+
+.nav__stat-value {
+  font-size: var(--text-label);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.nav__stat-value--pos {
+  color: var(--accent-text);
+}
+
+
 /* -------------------------------------------------------------- dropdown -- */
 
 .menu-anchor {
