@@ -411,6 +411,10 @@
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   padding-block-end: 0.125rem;
+  padding-inline-end: 0.5rem;
+  /* Smooth gradient mask so chips fade out gracefully before reaching the delete button */
+  mask-image: linear-gradient(to right, black 0%, black calc(100% - 1.25rem), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 0%, black calc(100% - 1.25rem), transparent 100%);
 }
 
 .row__cat-selector::-webkit-scrollbar {
@@ -445,6 +449,8 @@
   letter-spacing: 0.04em;
   color: var(--accent-text);
   background: var(--accent-wash);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
 }
 
 /* ----------------------------------------------------------------- empty -- */
