@@ -92,36 +92,6 @@ export default function App() {
     )
   }, [movements, scope, tab, anchor, today])
 
-  const visibleNet = useMemo(
-    () =>
-      visible.reduce(
-        (sum, m) => sum + (m.kind === 'ingreso' ? m.amount : -m.amount),
-        0,
-      ),
-    [visible],
-  )
-
-  const periodLabel = useMemo(() => {
-    if (tab === 'hoy') return 'hoy'
-    if (typeof tab === 'number') {
-      const d = addDays(startOfWeek(anchor), tab)
-      return `${WEEKDAYS[tab]} ${shortDate(
-        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
-          d.getDate(),
-        ).padStart(2, '0')}`,
-      )}`
-    }
-    if (scope === 'mes') return monthLabel(anchor)
-
-    const start = startOfWeek(anchor)
-    const end = addDays(start, 6)
-    const iso = (d: Date) =>
-      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
-        d.getDate(),
-      ).padStart(2, '0')}`
-    return `${shortDate(iso(start))} – ${shortDate(iso(end))}`
-  }, [scope, tab, anchor])
-
   /* ------------------------------------------------------------ actions -- */
 
   const handleScopeChange = useCallback((next: Scope) => {
@@ -237,16 +207,8 @@ export default function App() {
         tab={tab}
         onScopeChange={handleScopeChange}
         onTabChange={setTab}
-        selectedNet={visibleNet}
-        currency={settings.currency}
-        locale={settings.locale}
+        monthName={monthLabel(anchor)}
       />
-
-      {tab !== 'hoy' && (
-        <div className="summary">
-          <span className="summary__period">{periodLabel}</span>
-        </div>
-      )}
 
       <main className="list">
         <MovementList

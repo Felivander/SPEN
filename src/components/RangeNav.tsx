@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { WEEKDAYS } from '../lib/dates'
-import { formatMoney } from '../lib/format'
 import type { Scope, Tab } from '../types'
 import { CheckIcon } from './icons'
 
@@ -14,9 +13,7 @@ interface Props {
   tab: Tab
   onScopeChange: (scope: Scope) => void
   onTabChange: (tab: Tab) => void
-  selectedNet: number
-  currency: string
-  locale: string
+  monthName: string
 }
 
 export function RangeNav({
@@ -24,9 +21,7 @@ export function RangeNav({
   tab,
   onScopeChange,
   onTabChange,
-  selectedNet,
-  currency,
-  locale,
+  monthName,
 }: Props) {
   const [open, setOpen] = useState(false)
   const anchorRef = useRef<HTMLDivElement>(null)
@@ -128,10 +123,8 @@ export function RangeNav({
         )}
       </div>
 
-      <div className="nav__value">
-        <span className={`nav__stat-value${selectedNet > 0 ? ' nav__stat-value--pos' : ''}`}>
-          {formatMoney(selectedNet, currency, locale)}
-        </span>
+      <div className="nav__month">
+        <span className="nav__month-label">{monthName}</span>
       </div>
     </nav>
   )
