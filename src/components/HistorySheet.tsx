@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { formatSigned, formatMoney } from '../lib/format'
 import { fromISODate, MONTHS, todayISO, WEEKDAYS, weekdayIndex } from '../lib/dates'
 import { CATEGORIES } from '../lib/categories'
-import { CloseIcon, ListIcon } from './icons'
+import { ChevronLeft } from './icons'
 import type { Movement } from '../types'
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
   onClose: () => void
 }
 
-type HistTab = 'log' | 'resumen'
+type HistTab = 'todo' | 'resumen'
 
 function dayHeading(iso: string): string {
   if (iso === todayISO()) return 'hoy'
@@ -22,7 +22,7 @@ function dayHeading(iso: string): string {
 
 /* ------------------------------------------------------------------ Log -- */
 
-function LogTab({ movements, currency, locale }: Omit<Props, 'onClose'>) {
+function TodoTab({ movements, currency, locale }: Omit<Props, 'onClose'>) {
   if (movements.length === 0) {
     return (
       <div className="hist__empty">
@@ -43,7 +43,7 @@ function LogTab({ movements, currency, locale }: Omit<Props, 'onClose'>) {
   }
 
   return (
-    <div className="hist__log">
+    <div className="hist__list">
       {groups.map((group) => (
         <section key={group.date}>
           <h3 className="hist__daylabel">{dayHeading(group.date)}</h3>
@@ -97,7 +97,7 @@ function ResumenTab({ movements, currency, locale }: Omit<Props, 'onClose'>) {
   }
 
   return (
-    <div className="hist__resumen">
+    <div className="hist__list">
       {/* Totals header */}
       <div className="hist__totals">
         <div className="hist__total-item">
@@ -154,57 +154,57 @@ function ResumenTab({ movements, currency, locale }: Omit<Props, 'onClose'>) {
   )
 }
 
-/* ----------------------------------------------------------------- Sheet -- */
+/* ------------------------------------------------------------------ Page -- */
 
-export function HistorySheet({ movements, currency, locale, onClose }: Props) {
-  const [tab, setTab] = useState<HistTab>('log')
+export function HistoryPage({ movements, currency, locale, onClose }: Props) {
+  const [tab, setTab] = useState<HistTab>('todo')
 
   return (
-    <>
-      <div className="scrim" onClick={onClose} aria-hidden="true" />
-      <div className="sheet" role="dialog" aria-label="Historial del mes" aria-modal="true">
-        <div className="sheet__grip" aria-hidden="true" />
+    <div className="hist-page" role="region" aria-label="Historial del mes">
+      {/* Header — same structure as main .header */}
+      <header className="hist-page__header">
+        <button
+          type="button"
+          className="icon-btn"
+          onClick={onClose}
+          aria-label="Volver"
+        >
+        <ChevronLeft />
+        </button>
+        <span className="hist-page__title">Historial</span>
+      </header>
 
-        <div className="sheet__head">
-          <h2 className="sheet__title">Historial</h2>
+      {/* Tab bar — same .tab class as RangeNav */}
+      <nav className="hist-page__nav" aria-label="Vista de historial">
+        <div className="nav__scroller" role="tablist">
           <button
             type="button"
-            className="icon-btn"
-            onClick={onClose}
-            aria-label="Cerrar historial"
-          >
-            <CloseIcon />
-          </button>
-        </div>
-
-        {/* Tab bar */}
-        <div className="hist__tabbar" role="tablist">
-          <button
             role="tab"
-            type="button"
-            className={`hist__tab${tab === 'log' ? ' hist__tab--active' : ''}`}
-            aria-selected={tab === 'log'}
-            onClick={() => setTab('log')}
+            className="tab"
+            aria-selected={tab === 'todo'}
+            onClick={() => setTab('todo')}
           >
-            <ListIcon />
-            Log
+            todo
           </button>
           <button
-            role="tab"
             type="button"
-            className={`hist__tab${tab === 'resumen' ? ' hist__tab--active' : ''}`}
+            role="tab"
+            className="tab"
             aria-selected={tab === 'resumen'}
             onClick={() => setTab('resumen')}
           >
-            Resumen
+            resumen
           </button>
         </div>
+      </nav>
 
-        {tab === 'log'
-          ? <LogTab movements={movements} currency={currency} locale={locale} />
+      {/* Content */}
+      <main className="hist-page__body">
+        {tab === 'todo'
+          ? <TodoTab movements={movements} currency={currency} locale={locale} />
           : <ResumenTab movements={movements} currency={currency} locale={locale} />
         }
-      </div>
-    </>
+      </main>
+    </div>
   )
 }

@@ -3,7 +3,7 @@ import './app.css'
 
 import { BalanceCard } from './components/BalanceCard'
 import { ChatBar, type ChatNote } from './components/ChatBar'
-import { HistorySheet } from './components/HistorySheet'
+import { HistoryPage } from './components/HistorySheet'
 import { MovementList } from './components/MovementList'
 import { RangeNav } from './components/RangeNav'
 import { SettingsSheet } from './components/SettingsSheet'
@@ -302,7 +302,7 @@ export default function App() {
       )}
 
       {historyOpen && (
-        <HistorySheet
+        <HistoryPage
           movements={movementsThisMonth}
           currency={settings.currency}
           locale={settings.locale}
