@@ -90,6 +90,15 @@ export default function App() {
     )
   }, [movements, scope, tab, anchor, today])
 
+  const visibleNet = useMemo(
+    () =>
+      visible.reduce(
+        (sum, m) => sum + (m.kind === 'ingreso' ? m.amount : -m.amount),
+        0,
+      ),
+    [visible],
+  )
+
   /* ------------------------------------------------------------ actions -- */
 
   const handleScopeChange = useCallback((next: Scope) => {
@@ -207,6 +216,14 @@ export default function App() {
         onTabChange={setTab}
         monthName={monthLabel(anchor)}
       />
+
+      <div className="summary">
+        <span
+          className={`summary__net${visibleNet > 0 ? ' summary__net--positive' : ''}`}
+        >
+          {formatMoney(visibleNet, settings.currency, settings.locale)}
+        </span>
+      </div>
 
       <main className="list">
         <MovementList
