@@ -7,7 +7,7 @@ import { HistoryPage } from './components/HistorySheet'
 import { MovementList } from './components/MovementList'
 import { RangeNav } from './components/RangeNav'
 import { SettingsSheet } from './components/SettingsSheet'
-import { HistoryIcon, MenuIcon } from './components/icons'
+import { HistoryIcon, MenuIcon, ChevronLeft, ChevronRight } from './components/icons'
 
 import {
   addDays,
@@ -128,6 +128,15 @@ export default function App() {
     return `${shortDate(iso(start))} – ${shortDate(iso(end))}`
   }, [scope, tab, anchor])
 
+  /** Don't let the user page into empty future periods. */
+  const canStepForward = useMemo(() => {
+    const now = new Date()
+    return scope === 'mes'
+      ? anchor.getFullYear() < now.getFullYear() ||
+          (anchor.getFullYear() === now.getFullYear() && anchor.getMonth() < now.getMonth())
+      : startOfWeek(anchor).getTime() < startOfWeek(now).getTime()
+  }, [scope, anchor])
+
   /* ------------------------------------------------------------ actions -- */
 
   const handleScopeChange = useCallback((next: Scope) => {
@@ -136,6 +145,20 @@ export default function App() {
     // Week scope opens on today's weekday; month scope opens on the whole month.
     setTab(next === 'semana' ? weekdayIndex(new Date()) : 'periodo')
   }, [])
+
+  const handleStep = useCallback(
+    (delta: -1 | 1) => {
+      setAnchor((prev) => {
+        if (scope === 'mes') {
+          return new Date(prev.getFullYear(), prev.getMonth() + delta, 1)
+        }
+        return addDays(prev, delta * 7)
+      })
+      // "hoy" is meaningless once you leave the current period.
+      setTab((prev) => (prev === 'hoy' ? 'periodo' : prev))
+    },
+    [scope],
+  )
 
   const handleSubmit = useCallback(
     async (text: string) => {
@@ -250,7 +273,24 @@ export default function App() {
 
       {tab !== 'hoy' && (
         <div className="summary">
+          <button
+            type="button"
+            className="summary__step"
+            onClick={() => handleStep(-1)}
+            aria-label="Período anterior"
+          >
+            <ChevronLeft size={16} />
+          </button>
           <span className="summary__period">{periodLabel}</span>
+          <button
+            type="button"
+            className="summary__step"
+            onClick={() => handleStep(1)}
+            disabled={!canStepForward}
+            aria-label="Período siguiente"
+          >
+            <ChevronRight size={16} />
+          </button>
         </div>
       )}
 
@@ -285,7 +325,7 @@ export default function App() {
 
       {historyOpen && (
         <HistoryPage
-          movements={movementsThisMonth}
+          movements={movements}
           currency={settings.currency}
           locale={settings.locale}
           onClose={() => setHistoryOpen(false)}

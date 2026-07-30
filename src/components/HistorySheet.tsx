@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { formatSigned, formatMoney } from '../lib/format'
-import { fromISODate, MONTHS, todayISO, WEEKDAYS, weekdayIndex } from '../lib/dates'
+import { fromISODate, isSameMonth, monthLabel, MONTHS, todayISO, WEEKDAYS, weekdayIndex } from '../lib/dates'
 import { CATEGORIES } from '../lib/categories'
-import { ChevronLeft } from './icons'
+import { ChevronLeft, ChevronRight } from './icons'
 import type { Movement } from '../types'
 
 interface Props {
@@ -26,7 +26,7 @@ function TodoTab({ movements, currency, locale }: Omit<Props, 'onClose'>) {
   if (movements.length === 0) {
     return (
       <div className="hist__empty">
-        <p>Sin movimientos este mes.</p>
+        <p>Sin movimientos en este período.</p>
       </div>
     )
   }
@@ -91,7 +91,7 @@ function ResumenTab({ movements, currency, locale }: Omit<Props, 'onClose'>) {
   if (stats.rows.length === 0) {
     return (
       <div className="hist__empty">
-        <p>Sin movimientos este mes.</p>
+        <p>Sin movimientos en este período.</p>
       </div>
     )
   }
@@ -158,10 +158,28 @@ function ResumenTab({ movements, currency, locale }: Omit<Props, 'onClose'>) {
 
 export function HistoryPage({ movements, currency, locale, onClose }: Props) {
   const [tab, setTab] = useState<HistTab>('todo')
+  const [monthAnchor, setMonthAnchor] = useState<Date>(() => new Date())
+
+  const monthMovements = useMemo(() => {
+    return movements.filter((m) => isSameMonth(m.date, monthAnchor))
+  }, [movements, monthAnchor])
+
+  const canStepForward = useMemo(() => {
+    const now = new Date()
+    return (
+      monthAnchor.getFullYear() < now.getFullYear() ||
+      (monthAnchor.getFullYear() === now.getFullYear() &&
+        monthAnchor.getMonth() < now.getMonth())
+    )
+  }, [monthAnchor])
+
+  const handleStepMonth = (delta: -1 | 1) => {
+    setMonthAnchor((prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1))
+  }
 
   return (
-    <div className="hist-page" role="region" aria-label="Historial del mes">
-      {/* Header — same structure as main .header */}
+    <div className="hist-page" role="region" aria-label="Historial de movimientos">
+      {/* Header — back button + title */}
       <header className="hist-page__header">
         <button
           type="button"
@@ -169,12 +187,34 @@ export function HistoryPage({ movements, currency, locale, onClose }: Props) {
           onClick={onClose}
           aria-label="Volver"
         >
-        <ChevronLeft />
+          <ChevronLeft />
         </button>
         <span className="hist-page__title">Historial</span>
       </header>
 
-      {/* Tab bar — same .tab class as RangeNav */}
+      {/* Month selection bar */}
+      <div className="hist-page__month-bar">
+        <button
+          type="button"
+          className="hist-page__step-btn"
+          onClick={() => handleStepMonth(-1)}
+          aria-label="Mes anterior"
+        >
+          <ChevronLeft />
+        </button>
+        <span className="hist-page__month-label">{monthLabel(monthAnchor)}</span>
+        <button
+          type="button"
+          className="hist-page__step-btn"
+          onClick={() => handleStepMonth(1)}
+          disabled={!canStepForward}
+          aria-label="Mes siguiente"
+        >
+          <ChevronRight />
+        </button>
+      </div>
+
+      {/* Tab bar — todo / resumen */}
       <nav className="hist-page__nav" aria-label="Vista de historial">
         <div className="nav__scroller" role="tablist">
           <button
@@ -201,8 +241,8 @@ export function HistoryPage({ movements, currency, locale, onClose }: Props) {
       {/* Content */}
       <main className="hist-page__body">
         {tab === 'todo'
-          ? <TodoTab movements={movements} currency={currency} locale={locale} />
-          : <ResumenTab movements={movements} currency={currency} locale={locale} />
+          ? <TodoTab movements={monthMovements} currency={currency} locale={locale} />
+          : <ResumenTab movements={monthMovements} currency={currency} locale={locale} />
         }
       </main>
     </div>
