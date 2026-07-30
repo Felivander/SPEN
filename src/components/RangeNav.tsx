@@ -14,27 +14,17 @@ interface Props {
   tab: Tab
   onScopeChange: (scope: Scope) => void
   onTabChange: (tab: Tab) => void
-  todayNet: number
-  monthNet: number
+  selectedNet: number
   currency: string
   locale: string
 }
 
-/**
- * Text-only mini nav.
- *
- * The scope chip is dual-purpose, matching the sketch: when it is not the
- * active tab a tap selects the whole period; when it already is active a tap
- * opens the scope menu. The chevron is always present so the menu is
- * discoverable either way.
- */
 export function RangeNav({
   scope,
   tab,
   onScopeChange,
   onTabChange,
-  todayNet,
-  monthNet,
+  selectedNet,
   currency,
   locale,
 }: Props) {
@@ -138,19 +128,10 @@ export function RangeNav({
         )}
       </div>
 
-      <div className="nav__stats">
-        <div className="nav__stat">
-          <span className="nav__stat-label">hoy</span>
-          <span className={`nav__stat-value${todayNet > 0 ? ' nav__stat-value--pos' : ''}`}>
-            {formatMoney(todayNet, currency, locale)}
-          </span>
-        </div>
-        <div className="nav__stat">
-          <span className="nav__stat-label">mes</span>
-          <span className={`nav__stat-value${monthNet > 0 ? ' nav__stat-value--pos' : ''}`}>
-            {formatMoney(monthNet, currency, locale)}
-          </span>
-        </div>
+      <div className="nav__value">
+        <span className={`nav__stat-value${selectedNet > 0 ? ' nav__stat-value--pos' : ''}`}>
+          {formatMoney(selectedNet, currency, locale)}
+        </span>
       </div>
     </nav>
   )
