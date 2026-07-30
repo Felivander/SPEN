@@ -76,12 +76,6 @@ export default function App() {
     [movements, today],
   )
 
-  /** All movements in the current calendar month (for the history sheet). */
-  const movementsThisMonth = useMemo(() => {
-    const now = new Date()
-    return movements.filter((m) => isSameMonth(m.date, now))
-  }, [movements])
-
   /** The movements the current scope + tab selects. */
   const visible = useMemo(() => {
     const inScope = movements.filter((m) =>
