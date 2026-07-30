@@ -502,11 +502,7 @@
   transition: border-color var(--fast) var(--ease);
 }
 
-/* Focus ring is state, not elevation — the one box-shadow that earns its keep. */
-.chat__form:focus-within {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent);
-}
+/* focus-within highlight removed — only the submit button keeps the accent colour. */
 
 .chat__input {
   flex: 1 1 auto;

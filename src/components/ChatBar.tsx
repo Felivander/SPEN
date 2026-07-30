@@ -68,7 +68,7 @@ export function ChatBar({ busy, note, onSubmit, onHeightChange }: Props) {
           type="text"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder="café 1.200, nafta 15 mil…"
+          placeholder=""
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="sentences"

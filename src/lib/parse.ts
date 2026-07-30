@@ -69,6 +69,8 @@ function resolveDate(text: string): string {
 /** Strips the amount, filler words and date words to leave a usable label. */
 function cleanDescription(text: string, amountToken: string): string {
   let out = text.replace(amountToken, ' ')
+  // Remove the + sign used as income marker (e.g. "prestamo male +3000" → "prestamo male")
+  out = out.replace(/\+\s*/g, ' ')
   out = out.replace(
     /\b(gaste|gasté|gasto|pague|pagué|compre|compré|cobre|cobré|cobro|me pagaron|ingreso|de|en|por|un|una|el|la|los|las|pesos|peso|ars|hoy|ayer|anteayer|manana|mañana)\b/gi,
     ' ',
@@ -87,8 +89,12 @@ function cleanDescription(text: string, amountToken: string): string {
  *  - a slash is almost always a date ("12/3"), so it is not a separator at all.
  */
 function splitChunks(input: string): string[] {
+  // Split on commas (not decimal), semicolons, "y", or + that follows a digit
+  // (meaning there's already an amount before it, e.g. "café 1200 + nafta 500").
+  // A + before a digit but after text (e.g. "prestamo male +3000") is an income
+  // marker and must NOT be treated as a separator.
   return input
-    .split(/\s*(?:,(?!\d)|;|\by\b|\+)\s*/i)
+    .split(/\s*(?:,(?!\d)|;|\by\b|(?<=\d)\s*\+\s*(?=\S))\s*/i)
     .map((c) => c.trim())
     .filter(Boolean)
 }
@@ -121,10 +127,15 @@ export function parseLocal(input: string): ParsedResult {
 
     if (amount === null || amount <= 0) continue
 
+    // A "+" immediately before the amount (anywhere in the chunk) marks it as income.
+    // Covers both "+3000" and "prestamo male +3000".
+    const forceIncome = /(?:^|\s)\+\s*\d/.test(chunk)
+
     const kindText = strip(chunk)
-    const kind: 'gasto' | 'ingreso' = INCOME_HINTS.some((h) => kindText.includes(strip(h)))
-      ? 'ingreso'
-      : 'gasto'
+    const kind: 'gasto' | 'ingreso' =
+      forceIncome || INCOME_HINTS.some((h) => kindText.includes(strip(h)))
+        ? 'ingreso'
+        : 'gasto'
 
     const description = cleanDescription(chunk, matchedText)
 

@@ -43,6 +43,7 @@ Reglas:
 - Un mensaje puede contener varios movimientos ("café 1200 y nafta 15000" son dos).
 - Interpretá la notación local: "1.200" son mil doscientos; "1.200,50" lleva centavos; "5k", "5 mil" y "5 lucas" son cinco mil; "2 palos" son dos millones.
 - Cobros, sueldos, ventas, reintegros y depósitos son "ingreso". Todo lo demás es "gasto".
+- Si el monto va precedido por un signo "+\" explícito (ej: "+3000", "+5 mil"), clasificalo siempre como "ingreso" independientemente de la descripción.
 - Resolvé fechas relativas: "ayer", "anteayer", "el martes", "12/3". Sin indicación, usá hoy.
 - Elegí la categoría más específica posible. Si ninguna encaja, usá "Otros".
 - Si el mensaje no contiene ningún monto, devolvé "movimientos": [] y explicá en una línea qué falta.
