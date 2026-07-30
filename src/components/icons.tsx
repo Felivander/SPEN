@@ -95,10 +95,10 @@ export function HistoryIcon({ size = 20, strokeWidth = 2 }: IconProps) {
       stroke="currentColor"
       strokeWidth={strokeWidth}
       strokeLinecap="round"
+      strokeLinejoin="round"
       aria-hidden="true"
     >
-      <line x1="3" y1="9" x2="21" y2="9" />
-      <line x1="3" y1="15" x2="21" y2="15" />
+      <rect x="4" y="4" width="16" height="16" rx="3" />
     </svg>
   )
 }
