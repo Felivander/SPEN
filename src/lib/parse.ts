@@ -84,17 +84,23 @@ function cleanDescription(text: string, amountToken: string): string {
 /**
  * Splits one message into candidate movements.
  *
- * Two separators need care rather than a naive split:
+ * Three separators need care rather than a naive split:
  *  - a comma between digits is a decimal mark ("1.200,50"), not a separator;
- *  - a slash is almost always a date ("12/3"), so it is not a separator at all.
+ *  - a slash is almost always a date ("12/3"), so it is not a separator at all;
+ *  - a "+" is ambiguous. After an amount it separates ("café 1200 + nafta 500");
+ *    before one it is the income marker ("préstamo male +3000").
  */
 function splitChunks(input: string): string[] {
-  // Split on commas (not decimal), semicolons, "y", or + that follows a digit
-  // (meaning there's already an amount before it, e.g. "café 1200 + nafta 500").
-  // A + before a digit but after text (e.g. "prestamo male +3000") is an income
-  // marker and must NOT be treated as a separator.
-  return input
-    .split(/\s*(?:,(?!\d)|;|\by\b|(?<=\d)\s*\+\s*(?=\S))\s*/i)
+  // Telling the two "+" apart reads naturally as a lookbehind — but Safari only
+  // gained those in 16.4, and this is an iPhone app first. esbuild silently
+  // downgrades an unsupported literal to `new RegExp(...)`, which converts a
+  // build error into a *runtime* one: the app loads fine, then throws on every
+  // message the user sends. So the separating "+" is rewritten to a comma with
+  // a capture group, and the existing comma rule does the split.
+  const normalised = input.replace(/(\d)\s*\+(?=\s*\S)/g, '$1, ')
+
+  return normalised
+    .split(/\s*(?:,(?!\d)|;|\by\b)\s*/i)
     .map((c) => c.trim())
     .filter(Boolean)
 }

@@ -73,6 +73,18 @@ const cases = [
   ['super 8.400 y nafta 15000', [{ amount: 8400 }, { amount: 15000 }]],
   ['spotify 3.500 y netflix 5.900', [{ amount: 3500 }, { amount: 5900 }]],
 
+  // "+" is ambiguous: separator after an amount, income marker before one.
+  // Both shapes are exercised because telling them apart is the subtle part.
+  ['+3000', [{ amount: 3000, kind: 'ingreso' }]],
+  ['prestamo male +3000', [{ amount: 3000, kind: 'ingreso' }]],
+  ['sueldo +1.450.000', [{ amount: 1450000, kind: 'ingreso' }]],
+  ['+2 lucas de propina', [{ amount: 2000, kind: 'ingreso' }]],
+  ['café 1200 + nafta 500', [{ amount: 1200, kind: 'gasto' }, { amount: 500, kind: 'gasto' }]],
+
+  // Categories added later
+  ['zari veterinaria 45000', [{ amount: 45000, category: 'Mascotas' }]],
+  ['hamburguesa 12000', [{ amount: 12000, category: 'Comida' }]],
+
   // Must record nothing rather than guess
   ['hola', []],
   ['dos cafés', []],
