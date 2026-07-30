@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { CATEGORIES } from '../lib/categories'
 import { formatSigned } from '../lib/format'
 import { fromISODate, MONTHS, timeLabel, todayISO, WEEKDAYS, weekdayIndex } from '../lib/dates'
 import type { Movement } from '../types'
@@ -10,6 +11,7 @@ interface Props {
   currency: string
   locale: string
   onDelete: (id: string) => void
+  onUpdateCategory: (id: string, category: string) => void
 }
 
 function dayHeading(iso: string): string {
@@ -18,7 +20,14 @@ function dayHeading(iso: string): string {
   return `${WEEKDAYS[weekdayIndex(d)]} ${d.getDate()} ${MONTHS[d.getMonth()].slice(0, 3)}`
 }
 
-export function MovementList({ movements, groupByDay, currency, locale, onDelete }: Props) {
+export function MovementList({
+  movements,
+  groupByDay,
+  currency,
+  locale,
+  onDelete,
+  onUpdateCategory,
+}: Props) {
   const [openId, setOpenId] = useState<string | null>(null)
 
   if (movements.length === 0) {
@@ -86,6 +95,18 @@ export function MovementList({ movements, groupByDay, currency, locale, onDelete
 
                 {isOpen && (
                   <div className="row__actions">
+                    <div className="row__cat-selector" role="group" aria-label="Cambiar categoría">
+                      {CATEGORIES.map((cat) => (
+                        <button
+                          key={cat}
+                          type="button"
+                          className={`cat-chip${m.category === cat ? ' cat-chip--active' : ''}`}
+                          onClick={() => onUpdateCategory(m.id, cat)}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
                     <button
                       type="button"
                       className="row__delete"

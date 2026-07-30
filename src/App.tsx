@@ -189,6 +189,12 @@ export default function App() {
     setMovements((prev) => prev.filter((m) => m.id !== id))
   }, [])
 
+  const handleUpdateCategory = useCallback((id: string, category: string) => {
+    setMovements((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, category } : m)),
+    )
+  }, [])
+
   // Clear the confirmation line after a beat so it doesn't linger as chrome.
   useEffect(() => {
     if (!note) return
@@ -255,6 +261,7 @@ export default function App() {
           currency={settings.currency}
           locale={settings.locale}
           onDelete={handleDelete}
+          onUpdateCategory={handleUpdateCategory}
         />
       </main>
 
