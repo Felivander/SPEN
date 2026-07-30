@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ArrowUpIcon, SpinnerIcon } from './icons'
 
 export interface ChatNote {
@@ -10,11 +10,29 @@ interface Props {
   busy: boolean
   note: ChatNote | null
   onSubmit: (text: string) => void
+  /** Reports the bar's rendered height so the list can reserve room under it. */
+  onHeightChange: (height: number) => void
 }
 
-export function ChatBar({ busy, note, onSubmit }: Props) {
+export function ChatBar({ busy, note, onSubmit, onHeightChange }: Props) {
   const [value, setValue] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+  const barRef = useRef<HTMLDivElement>(null)
+
+  // The bar grows and shrinks as the confirmation line comes and goes, and the
+  // safe-area inset differs per device, so the height is measured rather than
+  // assumed.
+  useEffect(() => {
+    const el = barRef.current
+    if (!el) return
+
+    const report = () => onHeightChange(el.offsetHeight)
+    report()
+
+    const observer = new ResizeObserver(report)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [onHeightChange])
 
   const send = (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,7 +45,7 @@ export function ChatBar({ busy, note, onSubmit }: Props) {
   }
 
   return (
-    <div className="chat">
+    <div className="chat" ref={barRef}>
       {note && (
         <p
           className={`chat__note${note.tone === 'error' ? ' chat__note--error' : ''}`}

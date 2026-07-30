@@ -7,6 +7,7 @@
    ========================================================================= */
 
 .app {
+  position: relative; /* anchor for the floating chat bar */
   display: flex;
   flex-direction: column;
   height: 100dvh;
@@ -285,7 +286,10 @@
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   padding-inline: var(--gutter);
-  padding-block-end: 1.5rem;
+  /* The chat bar floats over this column, so the list reserves exactly its
+     measured height (set from JS — it changes when the confirmation line
+     appears) plus a little air. Without this the last row hides under it. */
+  padding-block-end: calc(var(--chat-h, 4.25rem) + 0.75rem);
 }
 
 .list__daylabel {
@@ -421,13 +425,39 @@
 
 /* ------------------------------------------------------------------ chat -- */
 
+/* Floats over the list rather than sitting below it, so rows scroll under the
+   glass instead of stopping at a rule. No border: the blur is the separation.
+   The gradient mask fades the panel out at the top so there's no hard edge
+   where the frosting begins. */
 .chat {
-  flex: 0 0 auto;
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 20;
   padding-inline: var(--gutter);
-  padding-block: 0.625rem;
+  padding-block: 0.875rem 0.625rem;
   padding-bottom: max(0.625rem, env(safe-area-inset-bottom));
-  background: var(--paper);
-  border-block-start: 1px solid var(--rule);
+
+  /* 72% rather than a thinner glass: the confirmation line sits directly on
+     this panel, and a blurred dark row underneath would otherwise eat into
+     its contrast. Still obviously frosted, just readable at the same time. */
+  background: color-mix(in oklch, var(--paper) 72%, transparent);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 1.25rem);
+  mask-image: linear-gradient(to bottom, transparent, black 1.25rem);
+}
+
+/* Firefox has backdrop-filter behind a flag on some builds, and any browser
+   without it would render text straight over the scrolling rows. Fall back to
+   an opaque panel — less pretty, still readable. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .chat {
+    background: var(--paper);
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
 }
 
 .chat__note {

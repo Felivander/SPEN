@@ -44,6 +44,8 @@ export default function App() {
   const [busy, setBusy] = useState(false)
   const [note, setNote] = useState<ChatNote | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
+  /** Measured height of the floating chat bar, so the list can clear it. */
+  const [chatHeight, setChatHeight] = useState(68)
 
   useEffect(() => saveMovements(movements), [movements])
   useEffect(() => saveSettings(settings), [settings])
@@ -214,7 +216,10 @@ export default function App() {
   /* --------------------------------------------------------------- view -- */
 
   return (
-    <div className="app">
+    <div
+      className="app"
+      style={{ '--chat-h': `${chatHeight}px` } as React.CSSProperties}
+    >
       <header className="header">
         <button
           type="button"
@@ -261,7 +266,12 @@ export default function App() {
         />
       </main>
 
-      <ChatBar busy={busy} note={note} onSubmit={(t) => void handleSubmit(t)} />
+      <ChatBar
+        busy={busy}
+        note={note}
+        onSubmit={(t) => void handleSubmit(t)}
+        onHeightChange={setChatHeight}
+      />
 
       {sheetOpen && (
         <SettingsSheet

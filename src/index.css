@@ -169,6 +169,14 @@ html {
   overscroll-behavior-y: none;
 }
 
+/* The app is a fixed-height shell: only `.list` scrolls. Without this the
+   document itself can scroll a few pixels when 100dvh and 100% disagree
+   (browser chrome collapsing on mobile), which drags the floating chat bar
+   out of place. */
+body {
+  overflow: hidden;
+}
+
 body {
   font-family: var(--font);
   font-size: var(--text-body);
