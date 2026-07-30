@@ -98,6 +98,11 @@
   background: var(--accent);
 }
 
+/* Dot overwritten after cycling past DOT_COUNT — warmer red signals "spending a lot" */
+.dot--alert {
+  background: oklch(0.52 0.22 20);
+}
+
 .dot--pop {
   scale: 1.25;
 }

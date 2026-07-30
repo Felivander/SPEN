@@ -12,30 +12,39 @@ interface Props {
 }
 
 export function BalanceCard({ balance, todayCount, currency, locale }: Props) {
-  const filled = Math.min(todayCount, DOT_COUNT)
+  // Which "lap" we're on and where in the current lap we are.
+  const lap = Math.floor(todayCount / DOT_COUNT)
+  const pos = todayCount % DOT_COUNT  // 0 means just completed a full lap
 
-  // Pop the dot that just lit up. The colour change is the real signal; the
-  // scale is a one-shot flourish on a low-frequency event.
-  const previous = useRef(filled)
+  // Index of the dot that just lit up (for the pop animation).
+  // When pos===0 we just filled the last dot of a lap — index DOT_COUNT-1.
+  const newDotIndex = todayCount === 0 ? -1 : pos === 0 ? DOT_COUNT - 1 : pos - 1
+
+  const previous = useRef(newDotIndex)
   const [popIndex, setPopIndex] = useState<number | null>(null)
 
   useEffect(() => {
-    if (filled > previous.current) {
-      const index = filled - 1
-      setPopIndex(index)
+    if (todayCount > 0 && newDotIndex !== previous.current) {
+      setPopIndex(newDotIndex)
       const t = setTimeout(() => setPopIndex(null), 260)
-      previous.current = filled
+      previous.current = newDotIndex
       return () => clearTimeout(t)
     }
-    previous.current = filled
-  }, [filled])
+    previous.current = newDotIndex
+  }, [newDotIndex, todayCount])
 
-  const overflow = todayCount > DOT_COUNT ? `+${todayCount - DOT_COUNT}` : null
+  // Determine the visual state of each dot.
+  // lap 0 → normal fill up to pos.
+  // lap ≥ 1 → all dots on; dots < pos are "alert" (overwritten this cycle).
+  function dotState(i: number): 'off' | 'on' | 'alert' {
+    if (lap === 0) return i < todayCount ? 'on' : 'off'
+    // When pos===0 (exactly completed a lap) all dots are 'on', none alert yet.
+    if (pos === 0) return 'on'
+    return i < pos ? 'alert' : 'on'
+  }
 
   return (
     <section className="balance" aria-labelledby="balance-label">
-      {/* The number speaks for itself on screen; the label stays for
-          screen readers, which get no context from position alone. */}
       <span className="sr-only" id="balance-label">
         Saldo actual
       </span>
@@ -47,29 +56,25 @@ export function BalanceCard({ balance, todayCount, currency, locale }: Props) {
       <div
         className="dots"
         role="img"
-        aria-label={`${todayCount} ${todayCount === 1 ? 'movimiento' : 'movimientos'} anotados hoy`}
+        aria-label={`${todayCount} ${todayCount === 1 ? 'gasto' : 'gastos'} anotados hoy`}
       >
-        {Array.from({ length: DOT_COUNT }, (_, i) => (
-          <span
-            key={i}
-            className={[
-              'dot',
-              i < filled ? 'dot--on' : '',
-              i === popIndex ? 'dot--pop' : '',
-            ]
-              .filter(Boolean)
-              .join(' ')}
-          />
-        ))}
+        {Array.from({ length: DOT_COUNT }, (_, i) => {
+          const state = dotState(i)
+          return (
+            <span
+              key={i}
+              className={[
+                'dot',
+                state === 'on' ? 'dot--on' : '',
+                state === 'alert' ? 'dot--alert' : '',
+                i === popIndex ? 'dot--pop' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+            />
+          )
+        })}
       </div>
-
-      {/* Only appears once the day runs past the eight marks, so the row stays
-          a clean scale of eight on a normal day. */}
-      {overflow && (
-        <span className="dots__overflow" aria-hidden="true">
-          hoy {todayCount}
-        </span>
-      )}
     </section>
   )
 }
