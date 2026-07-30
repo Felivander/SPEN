@@ -192,28 +192,6 @@ export function HistoryPage({ movements, currency, locale, onClose }: Props) {
         <span className="hist-page__title">Historial</span>
       </header>
 
-      {/* Month selection bar */}
-      <div className="hist-page__month-bar">
-        <button
-          type="button"
-          className="hist-page__step-btn"
-          onClick={() => handleStepMonth(-1)}
-          aria-label="Mes anterior"
-        >
-          <ChevronLeft />
-        </button>
-        <span className="hist-page__month-label">{monthLabel(monthAnchor)}</span>
-        <button
-          type="button"
-          className="hist-page__step-btn"
-          onClick={() => handleStepMonth(1)}
-          disabled={!canStepForward}
-          aria-label="Mes siguiente"
-        >
-          <ChevronRight />
-        </button>
-      </div>
-
       {/* Tab bar — todo / resumen */}
       <nav className="hist-page__nav" aria-label="Vista de historial">
         <div className="nav__scroller" role="tablist">
@@ -245,6 +223,32 @@ export function HistoryPage({ movements, currency, locale, onClose }: Props) {
           : <ResumenTab movements={monthMovements} currency={currency} locale={locale} />
         }
       </main>
+
+      {/* Month picker — floats at the foot over the scrolling content, same
+          frosted panel as the chat bar on the main screen. Last in the DOM so
+          it follows the content in reading and tab order. */}
+      <div className="hist-page__month-bar">
+        <button
+          type="button"
+          className="hist-page__step-btn"
+          onClick={() => handleStepMonth(-1)}
+          aria-label="Mes anterior"
+        >
+          <ChevronLeft />
+        </button>
+        <span className="hist-page__month-label" aria-live="polite">
+          {monthLabel(monthAnchor)}
+        </span>
+        <button
+          type="button"
+          className="hist-page__step-btn"
+          onClick={() => handleStepMonth(1)}
+          disabled={!canStepForward}
+          aria-label="Mes siguiente"
+        >
+          <ChevronRight />
+        </button>
+      </div>
     </div>
   )
 }

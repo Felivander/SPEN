@@ -480,31 +480,41 @@
    glass instead of stopping at a rule. No border: the blur is the separation.
    The gradient mask fades the panel out at the top so there's no hard edge
    where the frosting begins. */
-.chat {
+/* Frosted panel shared by everything that floats over a scrolling column: the
+   chat bar on the main screen and the month picker on the history page. Kept
+   as one rule so the two can't drift apart.
+
+   72% rather than a thinner glass — text sits directly on these panels, and a
+   blurred dark row underneath would otherwise eat into its contrast. Still
+   obviously frosted, just readable at the same time. */
+.chat,
+.hist-page__month-bar {
   position: absolute;
   inset-inline: 0;
   inset-block-end: 0;
   z-index: 20;
-  padding-inline: var(--gutter);
-  padding-block: 0.875rem 0.625rem;
-  padding-bottom: max(0.625rem, env(safe-area-inset-bottom));
 
-  /* 72% rather than a thinner glass: the confirmation line sits directly on
-     this panel, and a blurred dark row underneath would otherwise eat into
-     its contrast. Still obviously frosted, just readable at the same time. */
   background: color-mix(in oklch, var(--paper) 72%, transparent);
   backdrop-filter: blur(22px) saturate(180%);
   -webkit-backdrop-filter: blur(22px) saturate(180%);
 
+  /* Fades the top edge so the frosting has no hard start. */
   -webkit-mask-image: linear-gradient(to bottom, transparent, black 1.25rem);
   mask-image: linear-gradient(to bottom, transparent, black 1.25rem);
+}
+
+.chat {
+  padding-inline: var(--gutter);
+  padding-block: 0.875rem 0.625rem;
+  padding-bottom: max(0.625rem, env(safe-area-inset-bottom));
 }
 
 /* Firefox has backdrop-filter behind a flag on some builds, and any browser
    without it would render text straight over the scrolling rows. Fall back to
    an opaque panel — less pretty, still readable. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .chat {
+  .chat,
+  .hist-page__month-bar {
     background: var(--paper);
     -webkit-mask-image: none;
     mask-image: none;
@@ -865,14 +875,18 @@
   letter-spacing: -0.01em;
 }
 
-/* Month selection bar inside History Page */
+/* Month picker — pinned to the foot of the page, mirroring the chat bar on the
+   main screen. Positioning and glass come from the shared rule above; this
+   block only handles layout. Its height is fixed (no growing note line), so
+   `.hist-page__body` can reserve a static amount rather than measuring. */
 .hist-page__month-bar {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  padding-block: 0.875rem 0.375rem;
   padding-inline: var(--gutter);
+  padding-block: 0.75rem;
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
 .hist-page__month-label {
@@ -909,7 +923,7 @@
   display: flex;
   align-items: center;
   padding-inline: var(--gutter);
-  margin-block-start: 0.5rem;
+  margin-block-start: 0.75rem;
 }
 
 /* Scrollable content area */
@@ -920,7 +934,9 @@
   -webkit-overflow-scrolling: touch;
   padding-inline: var(--gutter);
   padding-block-start: 0.5rem;
-  padding-block-end: max(1.5rem, env(safe-area-inset-bottom));
+  /* Clears the floating month bar: 0.75rem × 2 padding + a 2rem button,
+     plus the safe-area inset and a little air. */
+  padding-block-end: calc(4.25rem + env(safe-area-inset-bottom));
 }
 
 /* ---- shared row styles ---- */
