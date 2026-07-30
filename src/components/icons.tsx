@@ -13,6 +13,8 @@ import {
   ArrowUp,
   Check,
   Circle,
+  Journal,
+  List,
   NavArrowDown,
   NavArrowLeft,
   NavArrowRight,
@@ -82,4 +84,12 @@ export function SpinnerIcon({ size = 20, strokeWidth = 2 }: IconProps) {
 
 export function CloseIcon({ size = 22, strokeWidth = 1.5 }: IconProps) {
   return <Xmark width={size} height={size} strokeWidth={strokeWidth} aria-hidden="true" />
+}
+
+export function HistoryIcon({ size = 20, strokeWidth = 1.5 }: IconProps) {
+  return <Journal width={size} height={size} strokeWidth={strokeWidth} aria-hidden="true" />
+}
+
+export function ListIcon({ size = 18, strokeWidth = 1.5 }: IconProps) {
+  return <List width={size} height={size} strokeWidth={strokeWidth} aria-hidden="true" />
 }

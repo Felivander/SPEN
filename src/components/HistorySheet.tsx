@@ -1,0 +1,210 @@
+import { useMemo, useState } from 'react'
+import { formatSigned, formatMoney } from '../lib/format'
+import { fromISODate, MONTHS, todayISO, WEEKDAYS, weekdayIndex } from '../lib/dates'
+import { CATEGORIES } from '../lib/categories'
+import { CloseIcon, ListIcon } from './icons'
+import type { Movement } from '../types'
+
+interface Props {
+  movements: Movement[]
+  currency: string
+  locale: string
+  onClose: () => void
+}
+
+type HistTab = 'log' | 'resumen'
+
+function dayHeading(iso: string): string {
+  if (iso === todayISO()) return 'hoy'
+  const d = fromISODate(iso)
+  return `${WEEKDAYS[weekdayIndex(d)]} ${d.getDate()} ${MONTHS[d.getMonth()].slice(0, 3)}`
+}
+
+/* ------------------------------------------------------------------ Log -- */
+
+function LogTab({ movements, currency, locale }: Omit<Props, 'onClose'>) {
+  if (movements.length === 0) {
+    return (
+      <div className="hist__empty">
+        <p>Sin movimientos este mes.</p>
+      </div>
+    )
+  }
+
+  const sorted = [...movements].sort(
+    (a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt,
+  )
+
+  const groups: { date: string; items: Movement[] }[] = []
+  for (const m of sorted) {
+    const last = groups.at(-1)
+    if (last && last.date === m.date) last.items.push(m)
+    else groups.push({ date: m.date, items: [m] })
+  }
+
+  return (
+    <div className="hist__log">
+      {groups.map((group) => (
+        <section key={group.date}>
+          <h3 className="hist__daylabel">{dayHeading(group.date)}</h3>
+          {group.items.map((m) => (
+            <div key={m.id} className="hist__row">
+              <span className="hist__row-text">
+                <span className="hist__row-desc">{m.description}</span>
+                <span className="hist__row-meta">{m.category}</span>
+              </span>
+              <span className={`hist__row-amount${m.kind === 'ingreso' ? ' hist__row-amount--in' : ''}`}>
+                {formatSigned(m.amount, m.kind, currency, locale)}
+              </span>
+            </div>
+          ))}
+        </section>
+      ))}
+    </div>
+  )
+}
+
+/* --------------------------------------------------------------- Resumen -- */
+
+function ResumenTab({ movements, currency, locale }: Omit<Props, 'onClose'>) {
+  const stats = useMemo(() => {
+    const byCategory: Record<string, { gastos: number; ingresos: number }> = {}
+
+    for (const m of movements) {
+      if (!byCategory[m.category]) byCategory[m.category] = { gastos: 0, ingresos: 0 }
+      if (m.kind === 'gasto') byCategory[m.category].gastos += m.amount
+      else byCategory[m.category].ingresos += m.amount
+    }
+
+    const rows = CATEGORIES
+      .filter((cat) => byCategory[cat])
+      .map((cat) => ({ cat, ...byCategory[cat] }))
+      .sort((a, b) => (b.gastos + b.ingresos) - (a.gastos + a.ingresos))
+
+    const totalGastos = movements.filter(m => m.kind === 'gasto').reduce((s, m) => s + m.amount, 0)
+    const totalIngresos = movements.filter(m => m.kind === 'ingreso').reduce((s, m) => s + m.amount, 0)
+    const maxAmount = Math.max(...rows.map(r => r.gastos + r.ingresos), 1)
+
+    return { rows, totalGastos, totalIngresos, maxAmount }
+  }, [movements])
+
+  if (stats.rows.length === 0) {
+    return (
+      <div className="hist__empty">
+        <p>Sin movimientos este mes.</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="hist__resumen">
+      {/* Totals header */}
+      <div className="hist__totals">
+        <div className="hist__total-item">
+          <span className="hist__total-label">Gastos</span>
+          <span className="hist__total-value hist__total-value--out">
+            {formatMoney(-stats.totalGastos, currency, locale)}
+          </span>
+        </div>
+        <div className="hist__total-divider" />
+        <div className="hist__total-item">
+          <span className="hist__total-label">Ingresos</span>
+          <span className="hist__total-value hist__total-value--in">
+            +{formatMoney(stats.totalIngresos, currency, locale)}
+          </span>
+        </div>
+      </div>
+
+      {/* Per-category rows */}
+      {stats.rows.map(({ cat, gastos, ingresos }) => {
+        const total = gastos + ingresos
+        const pct = Math.round((total / stats.maxAmount) * 100)
+        const hasGastos = gastos > 0
+        const hasIngresos = ingresos > 0
+
+        return (
+          <div key={cat} className="hist__cat-row">
+            <div className="hist__cat-head">
+              <span className="hist__cat-name">{cat}</span>
+              <span className="hist__cat-amounts">
+                {hasGastos && (
+                  <span className="hist__cat-out">
+                    −{formatMoney(gastos, currency, locale)}
+                  </span>
+                )}
+                {hasGastos && hasIngresos && <span className="hist__cat-sep"> · </span>}
+                {hasIngresos && (
+                  <span className="hist__cat-in">
+                    +{formatMoney(ingresos, currency, locale)}
+                  </span>
+                )}
+              </span>
+            </div>
+            <div className="hist__bar-track">
+              <div
+                className="hist__bar-fill"
+                style={{ width: `${pct}%` }}
+                aria-hidden="true"
+              />
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+/* ----------------------------------------------------------------- Sheet -- */
+
+export function HistorySheet({ movements, currency, locale, onClose }: Props) {
+  const [tab, setTab] = useState<HistTab>('log')
+
+  return (
+    <>
+      <div className="scrim" onClick={onClose} aria-hidden="true" />
+      <div className="sheet" role="dialog" aria-label="Historial del mes" aria-modal="true">
+        <div className="sheet__grip" aria-hidden="true" />
+
+        <div className="sheet__head">
+          <h2 className="sheet__title">Historial</h2>
+          <button
+            type="button"
+            className="icon-btn"
+            onClick={onClose}
+            aria-label="Cerrar historial"
+          >
+            <CloseIcon />
+          </button>
+        </div>
+
+        {/* Tab bar */}
+        <div className="hist__tabbar" role="tablist">
+          <button
+            role="tab"
+            type="button"
+            className={`hist__tab${tab === 'log' ? ' hist__tab--active' : ''}`}
+            aria-selected={tab === 'log'}
+            onClick={() => setTab('log')}
+          >
+            <ListIcon />
+            Log
+          </button>
+          <button
+            role="tab"
+            type="button"
+            className={`hist__tab${tab === 'resumen' ? ' hist__tab--active' : ''}`}
+            aria-selected={tab === 'resumen'}
+            onClick={() => setTab('resumen')}
+          >
+            Resumen
+          </button>
+        </div>
+
+        {tab === 'log'
+          ? <LogTab movements={movements} currency={currency} locale={locale} />
+          : <ResumenTab movements={movements} currency={currency} locale={locale} />
+        }
+      </div>
+    </>
+  )
+}

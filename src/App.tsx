@@ -3,10 +3,11 @@ import './app.css'
 
 import { BalanceCard } from './components/BalanceCard'
 import { ChatBar, type ChatNote } from './components/ChatBar'
+import { HistorySheet } from './components/HistorySheet'
 import { MovementList } from './components/MovementList'
 import { RangeNav } from './components/RangeNav'
 import { SettingsSheet } from './components/SettingsSheet'
-import { MenuIcon } from './components/icons'
+import { HistoryIcon, MenuIcon } from './components/icons'
 
 import {
   addDays,
@@ -44,6 +45,7 @@ export default function App() {
   const [busy, setBusy] = useState(false)
   const [note, setNote] = useState<ChatNote | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [historyOpen, setHistoryOpen] = useState(false)
   /** Measured height of the floating chat bar, so the list can clear it. */
   const [chatHeight, setChatHeight] = useState(68)
 
@@ -73,6 +75,12 @@ export default function App() {
     () => movements.filter((m) => m.date === today).length,
     [movements, today],
   )
+
+  /** All movements in the current calendar month (for the history sheet). */
+  const movementsThisMonth = useMemo(() => {
+    const now = new Date()
+    return movements.filter((m) => isSameMonth(m.date, now))
+  }, [movements])
 
   /** The movements the current scope + tab selects. */
   const visible = useMemo(() => {
@@ -229,6 +237,15 @@ export default function App() {
         >
           <MenuIcon />
         </button>
+        <button
+          type="button"
+          className="icon-btn"
+          style={{ marginInlineStart: 'auto' }}
+          onClick={() => setHistoryOpen(true)}
+          aria-label="Abrir historial"
+        >
+          <HistoryIcon />
+        </button>
       </header>
 
       <BalanceCard
@@ -281,6 +298,15 @@ export default function App() {
           onImport={(imported) => setMovements(imported)}
           onClear={() => setMovements([])}
           onClose={() => setSheetOpen(false)}
+        />
+      )}
+
+      {historyOpen && (
+        <HistorySheet
+          movements={movementsThisMonth}
+          currency={settings.currency}
+          locale={settings.locale}
+          onClose={() => setHistoryOpen(false)}
         />
       )}
     </div>
