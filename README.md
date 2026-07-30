@@ -51,64 +51,56 @@ Si lo publicás en un subdirectorio (GitHub Pages), poné el nombre del repo en
 
 ---
 
-## La IA (Groq)
+## Deploy a GitHub Pages
 
-Sin configurar nada, la app usa un **lector local** por reglas: regex para los
-montos y un diccionario de palabras clave para las categorías. Anda offline y
-resuelve bien los casos comunes.
+Ya está configurado. En el repo: **Settings → Pages → Source: GitHub Actions**.
+Con eso, cada push a `main` corre `.github/workflows/deploy.yml`, que tipa,
+testea, buildea y publica.
 
-Con una clave de Groq se usa un modelo para los casos raros, y el lector local
-queda de red de contención: si falla la red, la clave, el CORS o el JSON, se
-cae al parser local y te avisa en la misma línea del chat.
+Queda en `https://felivander.github.io/SPEN/`.
 
-Clave gratis en [console.groq.com/keys](https://console.groq.com/keys). Modelos
-disponibles en Ajustes: Llama 3.3 70B (default), GPT-OSS 120B / 20B, Llama 3.1
-8B.
+El `base` de Vite apunta a `/SPEN/` porque Pages sirve el repo en un subdirectorio.
+Si renombrás el repo, cambiá esa constante en `vite.config.ts`. Para un dominio
+propio o Vercel, buildeá con `BASE_PATH=/`.
 
-### ⚠️ Seguridad de la clave — leelo antes de publicar el link
+---
 
-Hay dos formas de conectar Groq, y **no son igual de seguras**:
+## ¿Hace falta el LLM? No.
 
-| | Clave en el dispositivo | Proxy propio |
-|---|---|---|
-| Dónde vive la clave | `localStorage` del navegador | Variable de entorno del servidor |
-| ¿El navegador la ve? | **Sí** | No |
-| ¿Se puede leer desde devtools? | **Sí** | No |
-| ¿Sirve si compartís el link? | **No** — cada visitante tendría que poner la suya, y la tuya queda expuesta si la dejaste puesta | Sí |
-| Configuración | Pegar la clave en Ajustes | Deployar `api/parse.js` |
+**El lector local es el camino principal, no un plan B.** Es determinístico,
+instantáneo, gratis, funciona sin conexión y nada de lo que escribís sale del
+dispositivo. Hay 26 casos cubiertos en `npm test`:
 
-**La clave en el dispositivo queda a la vista.** Está en `localStorage`, viaja
-en el header de cada request y aparece en la pestaña Network. Cualquiera que
-abra las herramientas de desarrollador en ese teléfono o computadora la puede
-copiar. Para un uso personal en tu propio teléfono es un riesgo aceptable: la
-clave es gratis, no tiene datos de pago atrás y la rotás en dos clics. **No lo
-uses si vas a compartir la URL con otra gente.**
+| Entiende | Ejemplos |
+|---|---|
+| Notación es-AR | `1.200` · `1.200,50` · `5k` · `15 mil` · `2 lucas` · `2 palos` |
+| Números escritos | `dos mil` · `mil quinientos` · `cien mil` · `dos millones` |
+| Ingresos vs gastos | `cobré` · `me devolvieron` · `me entraron` · `sueldo` · `vendí` |
+| Fechas relativas | `ayer` · `anteayer` · `12/3` |
+| Varios por mensaje | `super 8.400 y nafta 15000` |
+| Categorías | ~200 palabras clave, incluidas cadenas de supermercado |
 
-**El proxy es la opción correcta si el link es público.** Deployás
-`api/parse.js`, ponés `GROQ_API_KEY` como variable de entorno del servidor, y
-apuntás `VITE_LLM_PROXY_URL` (o el campo Proxy en Ajustes) a ese endpoint. El
-navegador nunca recibe la clave.
+Y sabe **no** anotar: `hola`, `dos cafés` o `¿cuánto gasté este mes?` no generan
+movimientos.
 
-**Lo que el proxy igual no puede hacer:** es una URL pública, así que cualquiera
-que la descubra puede pegarle. Una app que corre en el navegador no tiene forma
-de guardar un secreto — cualquier token que le pongas al cliente se lee en el
-bundle. Por eso `api/parse.js` trae:
+**Lo que suma el LLM** son los casos sueltos: un comercio que no está en el
+diccionario, una frase muy conversacional, `el martes que viene`. Útil, no
+necesario.
 
-- **Allowlist de origen** (`ALLOWED_ORIGIN`) — corta el uso desde otras webs.
-  **Configurala**; si la dejás vacía queda en `*`.
-- **Rate limit por IP** (`RATE_PER_MIN`, default 20) — frena un loop.
-- **Forma de request fijada del lado del servidor** — el cliente elige el modelo
-  (de una lista cerrada) y el texto, nada más. No se puede usar como relay
-  genérico a Groq.
+### En un link público, andá sin LLM
 
-Nada de eso frena a alguien decidido con `curl`. El límite real es la cuota del
-free tier de Groq: revisá el uso de vez en cuando y rotá la clave si algo pinta
-raro.
+Es la opción correcta por tres razones: no hay clave que se filtre, no hay
+cuota tuya que alguien pueda quemar, y los gastos de cada visitante nunca salen
+de su dispositivo. Además GitHub Pages es hosting estático — no puede correr
+`api/parse.js` de todos modos.
 
-**Los gastos nunca salen del dispositivo** salvo el texto que escribís en el
-chat, que va a Groq para parsearse. Si no configurás IA, no sale nada.
+El build público sale sin IA por defecto: no pongas `VITE_LLM_PROXY_URL` y listo.
+Cada visitante que quiera IA pega **su propia** clave de Groq en Ajustes, en su
+propio dispositivo. Tu clave nunca entra en juego.
 
-### Deploy del proxy (Vercel)
+### Si igual querés el proxy (Vercel, no Pages)
+
+`api/parse.js` guarda la clave del lado del servidor: el navegador nunca la ve.
 
 ```bash
 vercel env add GROQ_API_KEY          # tu clave gsk_…
@@ -116,8 +108,32 @@ vercel env add ALLOWED_ORIGIN        # https://tu-app.vercel.app
 vercel deploy --prod
 ```
 
-Después, en Ajustes → Proxy, pegá `https://tu-app.vercel.app/api/parse`.
-O al buildear: `VITE_LLM_PROXY_URL=https://tu-app.vercel.app/api/parse npm run build`.
+Después, Ajustes → Proxy: `https://tu-app.vercel.app/api/parse`.
+
+**Lo que el proxy no puede hacer:** es una URL pública, y una app de navegador no
+tiene forma de guardar un secreto — cualquier token que le pases al cliente se
+lee en el bundle. Por eso trae allowlist de origen (`ALLOWED_ORIGIN`, **ponela**
+o queda en `*`), rate limit por IP (`RATE_PER_MIN`, default 20) y la forma del
+request fijada del servidor. Nada de eso frena a alguien con `curl`: el límite
+real es la cuota del free tier, así que mirá el uso de vez en cuando.
+
+### La clave en el dispositivo queda a la vista
+
+Está en `localStorage` y viaja en el header de cada request, así que se lee
+desde devtools. Si es **tu** clave en **tu** teléfono, es un riesgo aceptable:
+es gratis, no tiene medio de pago atrás y la rotás en dos clics. Lo que no hay
+que hacer es buildear el sitio público con tu clave adentro.
+
+---
+
+## Tests
+
+```bash
+npm test
+```
+
+26 casos sobre el lector local, incluidos los que **no** deben registrar nada.
+Corren también en CI antes de cada deploy.
 
 ---
 
@@ -179,15 +195,18 @@ src/
     SettingsSheet.tsx     apariencia, Groq, datos
     icons.tsx             wrappers de Iconoir (un stroke, currentColor)
   lib/
-    llm.ts                Groq + coerción y validación de la respuesta
-    parse.ts              lector local por reglas (fallback y offline)
+    parse.ts              lector local por reglas — el camino principal
+    numbers.ts            números escritos en palabras ("mil quinientos")
+    llm.ts                Groq opcional + validación de la respuesta
     categories.ts         categorías + diccionario de palabras clave
     dates.ts              semana con lunes primero, fechas locales
     format.ts             plata en es-AR
     storage.ts            localStorage + export/import
     theme.ts              claro / oscuro / sistema
-api/parse.js              proxy serverless opcional
+api/parse.js              proxy serverless opcional (no aplica en Pages)
 scripts/make-icons.mjs    genera los PNG del PWA sin dependencias
+scripts/test-parser.mjs   suite del lector local
+.github/workflows/        build + deploy automático a Pages
 ```
 
 ## Stack

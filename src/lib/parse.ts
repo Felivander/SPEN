@@ -1,5 +1,6 @@
 import { guessCategory, INCOME_HINTS } from './categories'
 import { addDays, todayISO, toISODate } from './dates'
+import { matchWordAmount } from './numbers'
 import type { ParsedResult } from '../types'
 
 const strip = (s: string) =>
@@ -79,23 +80,45 @@ function cleanDescription(text: string, amountToken: string): string {
 }
 
 /**
- * Offline parser. Runs when there's no LLM configured, when the network is
- * down, or when the LLM call fails — so the chat never becomes a dead end.
- * Splits on `y` / `,` / `+` so "café 1200 y nafta 15000" yields two movements.
+ * Splits one message into candidate movements.
+ *
+ * Two separators need care rather than a naive split:
+ *  - a comma between digits is a decimal mark ("1.200,50"), not a separator;
+ *  - a slash is almost always a date ("12/3"), so it is not a separator at all.
  */
-export function parseLocal(input: string): ParsedResult {
-  const chunks = input
-    .split(/\s*(?:,|;|\by\b|\+|\/)\s*/i)
+function splitChunks(input: string): string[] {
+  return input
+    .split(/\s*(?:,(?!\d)|;|\by\b|\+)\s*/i)
     .map((c) => c.trim())
     .filter(Boolean)
+}
 
+/**
+ * Offline parser — the default path, and the fallback when the optional LLM
+ * is unavailable. Understands es-AR amount notation in digits and in words,
+ * relative dates, and several movements in one message.
+ */
+export function parseLocal(input: string): ParsedResult {
+  const chunks = splitChunks(input)
   const movements: ParsedResult['movements'] = []
 
   for (const chunk of chunks) {
+    // Digits first — they're unambiguous. Fall back to written-out numbers.
     const match = chunk.match(AMOUNT_RE)
-    if (!match) continue
+    let amount: number | null = null
+    let matchedText = ''
 
-    const amount = parseAmount(match[1], match[2])
+    if (match) {
+      amount = parseAmount(match[1], match[2])
+      matchedText = match[0]
+    } else {
+      const word = matchWordAmount(chunk)
+      if (word) {
+        amount = word.value
+        matchedText = chunk.slice(word.start, word.end)
+      }
+    }
+
     if (amount === null || amount <= 0) continue
 
     const kindText = strip(chunk)
@@ -103,7 +126,7 @@ export function parseLocal(input: string): ParsedResult {
       ? 'ingreso'
       : 'gasto'
 
-    const description = cleanDescription(chunk, match[0])
+    const description = cleanDescription(chunk, matchedText)
 
     movements.push({
       kind,

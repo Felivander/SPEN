@@ -103,9 +103,9 @@ export function SettingsSheet({
           />
           {connected
             ? viaProxy
-              ? 'IA activa vía servidor propio'
-              : 'IA activa vía Groq'
-            : 'Sin IA — lector local'}
+              ? 'Leyendo con IA (servidor propio)'
+              : 'Leyendo con IA (Groq)'
+            : 'Leyendo sin IA — modo local'}
         </p>
 
         {/* ----- Apariencia ------------------------------------------------ */}
@@ -133,7 +133,17 @@ export function SettingsSheet({
           </span>
         </div>
 
-        {/* ----- Groq ------------------------------------------------------ */}
+        {/* ----- Groq (opcional) ------------------------------------------- */}
+
+        <div className="field">
+          <span className="field__label">Lectura con IA — opcional</span>
+          <span className="field__hint">
+            La app ya entiende montos, fechas y categorías sin nada configurado, y
+            así nada de lo que escribís sale del teléfono. Poné una clave solo si
+            querés que además resuelva frases más sueltas o comercios que no
+            conoce. Es <strong>tu</strong> clave, en <strong>tu</strong> dispositivo.
+          </span>
+        </div>
 
         <label className="field">
           <span className="field__label">Clave de Groq</span>
@@ -153,11 +163,10 @@ export function SettingsSheet({
               <>La clave vive en tu servidor; el navegador nunca la recibe. Este campo queda inactivo.</>
             ) : (
               <>
-                <strong>Queda a la vista.</strong> Se guarda en este dispositivo y se manda desde
-                el navegador, así que se puede leer desde las herramientas de desarrollador o
-                copiar si alguien te agarra el teléfono desbloqueado. Para uso personal
-                alcanza: es gratis y la rotás en dos clics. Si vas a compartir el link con
-                alguien más, poné un proxy abajo. Clave gratis en{' '}
+                <strong>Queda a la vista.</strong> Se guarda en este navegador y se manda
+                desde acá, así que se puede leer desde las herramientas de desarrollador
+                o si alguien te agarra el teléfono desbloqueado. Como es tuya y es gratis,
+                el riesgo es tuyo y la rotás en dos clics. Sacá una en{' '}
                 <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer noopener">
                   console.groq.com/keys
                 </a>

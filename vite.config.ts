@@ -3,8 +3,15 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  // Set to '/xpenz/' (or your repo name) if hosting under a subpath, e.g. GitHub Pages.
-  base: './',
+  /**
+   * GitHub Pages serves this repo from https://<user>.github.io/SPEN/, so the
+   * app lives under a subpath and needs an absolute base — a relative './'
+   * breaks the service worker scope and the manifest's start_url.
+   *
+   * Deploying to a root domain instead (Vercel, Netlify, a custom domain)?
+   * Build with BASE_PATH=/ and everything resolves at the root.
+   */
+  base: process.env.BASE_PATH ?? '/SPEN/',
   plugins: [
     react(),
     VitePWA({
