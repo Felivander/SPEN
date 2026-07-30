@@ -113,7 +113,7 @@ export function RangeNav({
             role="tab"
             className="tab"
             aria-selected={tab === 'hoy'}
-            onClick={() => onTabChange('hoy')}
+            onClick={() => onTabChange(tab === 'hoy' ? 'periodo' : 'hoy')}
           >
             hoy
           </button>
