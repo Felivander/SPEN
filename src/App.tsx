@@ -72,7 +72,7 @@ export default function App() {
 
   const today = todayISO()
   const todayCount = useMemo(
-    () => movements.filter((m) => m.date === today).length,
+    () => movements.filter((m) => m.date === today && m.kind === 'gasto').length,
     [movements, today],
   )
 
