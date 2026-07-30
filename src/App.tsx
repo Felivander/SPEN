@@ -15,11 +15,9 @@ import {
   isInWeekOf,
   isSameMonth,
   monthLabel,
-  shortDate,
   startOfWeek,
   todayISO,
   weekdayIndex,
-  WEEKDAYS,
 } from './lib/dates'
 import { formatMoney } from './lib/format'
 import { parseMessage } from './lib/llm'
