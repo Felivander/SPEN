@@ -8,6 +8,7 @@ export const CATEGORIES = [
   'Transporte',
   'Hogar',
   'Salud',
+  'Mascotas',
   'Ocio',
   'Compras',
   'Servicios',
@@ -32,6 +33,9 @@ export const KEYWORDS: Record<Category, string[]> = {
     // comunes y arrastrarían frases que no hablan de un supermercado.
     'coto', 'carrefour', 'jumbo', 'walmart', 'changomas', 'chango mas',
     'la anonima', 'la anónima', 'makro', 'diarco',
+    // Bebidas
+    'coca', 'coca cola', 'pepsi', 'sprite', 'fanta', 'agua mineral', 'jugo',
+    'energizante', 'red bull', 'monster',
   ],
   Transporte: [
     'nafta', 'combustible', 'taxi', 'uber', 'cabify', 'didi', 'colectivo',
@@ -49,6 +53,13 @@ export const KEYWORDS: Record<Category, string[]> = {
     'remedio', 'remedios', 'analisis', 'análisis', 'gimnasio', 'gym', 'psicologa',
     'psicóloga', 'psicologo', 'psicólogo', 'kinesiologia', 'kinesiología',
     'oculista', 'salud',
+  ],
+  Mascotas: [
+    'zari', 'mascota', 'mascotas', 'perro', 'gato', 'veterinaria', 'veterinario',
+    'alimento mascota', 'royal canin', 'pedigree', 'whiskas', 'dog chow',
+    'arena gato', 'correa', 'collar', 'antiparasitario', 'pulgas', 'garrapatas',
+    'petshop', 'pet shop', 'acuario', 'hamster', 'conejo', 'pajaro', 'pájaro',
+    'canario', 'cachorro', 'gatito', 'vacuna perro', 'vacuna gato',
   ],
   Ocio: [
     'cine', 'netflix', 'spotify', 'disney', 'hbo', 'max', 'juego', 'juegos',
