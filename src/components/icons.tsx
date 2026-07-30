@@ -13,7 +13,6 @@ import {
   ArrowUp,
   Check,
   Circle,
-  Journal,
   List,
   NavArrowDown,
   NavArrowLeft,
@@ -86,8 +85,22 @@ export function CloseIcon({ size = 22, strokeWidth = 1.5 }: IconProps) {
   return <Xmark width={size} height={size} strokeWidth={strokeWidth} aria-hidden="true" />
 }
 
-export function HistoryIcon({ size = 20, strokeWidth = 1.5 }: IconProps) {
-  return <Journal width={size} height={size} strokeWidth={strokeWidth} aria-hidden="true" />
+export function HistoryIcon({ size = 20, strokeWidth = 2 }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      <line x1="3" y1="7" x2="17" y2="7" />
+      <line x1="3" y1="13" x2="17" y2="13" />
+    </svg>
+  )
 }
 
 export function ListIcon({ size = 18, strokeWidth = 1.5 }: IconProps) {
