@@ -242,9 +242,11 @@ export default function App() {
         locale={settings.locale}
       />
 
-      <div className="summary">
-        <span className="summary__period">{periodLabel}</span>
-      </div>
+      {tab !== 'hoy' && (
+        <div className="summary">
+          <span className="summary__period">{periodLabel}</span>
+        </div>
+      )}
 
       <main className="list">
         <MovementList
