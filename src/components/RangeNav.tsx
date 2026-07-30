@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { WEEKDAYS } from '../lib/dates'
 import type { Scope, Tab } from '../types'
-import { CheckIcon, ChevronDown, ChevronLeft, ChevronRight } from './icons'
+import { CheckIcon, ChevronLeft, ChevronRight } from './icons'
 
 const SCOPES: { value: Scope; label: string }[] = [
   { value: 'mes', label: 'Mes' },
@@ -79,14 +79,13 @@ export function RangeNav({
             ref={chipRef}
             type="button"
             role="tab"
-            className="tab tab--scope"
+            className="tab"
             aria-selected={periodSelected}
             aria-haspopup="menu"
             aria-expanded={open}
             onClick={handleChip}
           >
             {scope}
-            <ChevronDown />
           </button>
 
           {open && (
@@ -107,8 +106,6 @@ export function RangeNav({
             </div>
           )}
         </div>
-
-        <span className="nav__divider" aria-hidden="true" />
 
         {scope === 'mes' ? (
           <button

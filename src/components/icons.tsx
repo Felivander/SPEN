@@ -34,19 +34,6 @@ export function MenuIcon({ size = 20, strokeWidth = 2 }: IconProps) {
   return <Circle width={size} height={size} strokeWidth={strokeWidth} aria-hidden="true" />
 }
 
-/** Scope chip affordance — rotates open via `.tab__chevron`. */
-export function ChevronDown({ size = 15, strokeWidth = 2 }: IconProps) {
-  return (
-    <NavArrowDown
-      width={size}
-      height={size}
-      strokeWidth={strokeWidth}
-      className="tab__chevron"
-      aria-hidden="true"
-    />
-  )
-}
-
 export function ChevronDownPlain({ size = 18, strokeWidth = 2 }: IconProps) {
   return (
     <NavArrowDown width={size} height={size} strokeWidth={strokeWidth} aria-hidden="true" />
