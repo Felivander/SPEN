@@ -18,8 +18,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['apple-touch-icon.png', 'icon.svg'],
       manifest: {
-        name: 'Xpenz',
-        short_name: 'Xpenz',
+        name: 'Spens',
+        short_name: 'Spens',
         description: 'Gastos e ingresos, anotados hablando.',
         lang: 'es',
         dir: 'ltr',
