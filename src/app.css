@@ -271,12 +271,11 @@
 .summary {
   flex: 0 0 auto;
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
   gap: 1rem;
   padding-inline: var(--gutter);
   padding-block: 0.875rem 0.625rem;
-  border-block-end: 1px solid var(--rule);
 }
 
 .summary__period {
@@ -287,6 +286,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: center;
 }
 
 .summary__net {
@@ -334,7 +334,6 @@
   display: block;
   text-align: start;
   padding-block: 0.75rem;
-  border-block-end: 1px solid var(--rule);
   border-radius: 0;
 }
 
