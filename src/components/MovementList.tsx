@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { CATEGORIES } from '../lib/categories'
 import { formatSigned } from '../lib/format'
-import { fromISODate, MONTHS, timeLabel, todayISO, WEEKDAYS, weekdayIndex } from '../lib/dates'
+import { fromISODate, timeLabel, todayISO, WEEKDAYS, weekdayIndex } from '../lib/dates'
 import type { Movement } from '../types'
 
 interface Props {
@@ -17,7 +17,7 @@ interface Props {
 function dayHeading(iso: string): string {
   if (iso === todayISO()) return 'hoy'
   const d = fromISODate(iso)
-  return `${WEEKDAYS[weekdayIndex(d)]} ${d.getDate()} ${MONTHS[d.getMonth()].slice(0, 3)}`
+  return `${WEEKDAYS[weekdayIndex(d)]} ${d.getDate()}`
 }
 
 const EVER_HAD_KEY = 'xpenz.everHadMovements'
