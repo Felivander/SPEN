@@ -38,6 +38,7 @@ export function SettingsSheet({
   const sheetRef = useRef<HTMLDivElement>(null)
   const scrimRef  = useRef<HTMLDivElement>(null)
   const gripRef   = useRef<HTMLDivElement>(null)
+  const bodyRef   = useRef<HTMLDivElement>(null)
   const fileRef   = useRef<HTMLInputElement>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
   const [authError, setAuthError] = useState<string | null>(null)
@@ -49,8 +50,8 @@ export function SettingsSheet({
       if (e.key === 'Escape') onClose()
     }
     document.addEventListener('keydown', onKeyDown)
-    // Always show the top of the sheet when it opens
-    if (sheetRef.current) sheetRef.current.scrollTop = 0
+    // Always show the top of the body when the sheet opens
+    if (bodyRef.current) bodyRef.current.scrollTop = 0
     sheetRef.current?.focus()
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [onClose])
@@ -100,7 +101,7 @@ export function SettingsSheet({
         tabIndex={-1}
         ref={sheetRef}
       >
-        <div className="sheet__sticky-top" ref={gripRef}>
+        <div className="sheet__header" ref={gripRef}>
           <div className="sheet__grip" aria-hidden="true" />
 
           <div className="sheet__head">
@@ -112,6 +113,8 @@ export function SettingsSheet({
             </button>
           </div>
         </div>
+
+        <div className="sheet__body" ref={bodyRef}>
 
         <p className="sheet__status">
           <span
@@ -337,6 +340,7 @@ export function SettingsSheet({
         <p className="field__hint" style={{ marginBlockStart: '1rem' }}>
           Todo se guarda en este dispositivo. Exportá de vez en cuando si no querés perderlo.
         </p>
+        </div>
       </div>
     </>
   )
