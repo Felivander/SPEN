@@ -68,6 +68,7 @@
   --accent-text: var(--l-accent-text);
   --accent-wash: var(--l-accent-wash);
   --on-accent: var(--l-on-accent);
+  --today-color: oklch(0.52 0.18 240);
   --scrim: var(--l-scrim);
 
 
@@ -113,6 +114,7 @@
     --accent-text: var(--d-accent-text);
     --accent-wash: var(--d-accent-wash);
     --on-accent: var(--d-on-accent);
+    --today-color: oklch(0.72 0.18 220);
     --scrim: var(--d-scrim);
   }
 }
@@ -130,6 +132,7 @@
   --accent-text: var(--d-accent-text);
   --accent-wash: var(--d-accent-wash);
   --on-accent: var(--d-on-accent);
+  --today-color: oklch(0.72 0.18 220);
   --scrim: var(--d-scrim);
 }
 
