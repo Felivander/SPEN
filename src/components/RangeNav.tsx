@@ -133,9 +133,42 @@ export function RangeNav({
   return (
     <nav className="nav" aria-label="Periodo">
       <div className="nav__scroller" role="tablist" aria-label="Rango de movimientos" ref={scrollerRef}>
-        {showMonthPicker ? (
-          // Inline 12-month picker replacing 'mes' & 'hoy' tabs
-          MONTH_ABBRS.map((m, index) => {
+        <div className="menu-anchor" ref={anchorRef}>
+          <button
+            ref={chipRef}
+            type="button"
+            role="tab"
+            className={`tab${!isCurrentMonth ? ' tab--custom-month' : ''}`}
+            aria-selected={periodSelected}
+            aria-haspopup="menu"
+            aria-expanded={open}
+            onClick={handleMainTabClick}
+          >
+            {mainTabLabel}
+          </button>
+
+          {open && (
+            <div className="menu" role="menu" aria-label="Elegir rango">
+              {SCOPES.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="menuitemradio"
+                  aria-checked={scope === option.value}
+                  className="menu__item"
+                  onClick={() => pickScope(option.value)}
+                >
+                  {option.label}
+                  {scope === option.value && <CheckIcon />}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Expanding 12-month picker with same smooth slide-in transition as anteayer/ayer */}
+        <div className={`nav__months${showMonthPicker ? ' nav__months--open' : ''}`} aria-hidden={!showMonthPicker}>
+          {MONTH_ABBRS.map((m, index) => {
             const isSelected = anchor.getMonth() === index
             const isTodayMonth = now.getMonth() === index && anchor.getFullYear() === now.getFullYear()
             return (
@@ -143,6 +176,7 @@ export function RangeNav({
                 key={m}
                 type="button"
                 role="tab"
+                tabIndex={showMonthPicker ? 0 : -1}
                 className={`tab${isSelected ? ' tab--selected-month' : ''}${isTodayMonth ? ' tab--today-month' : ''}`}
                 aria-selected={isSelected}
                 onClick={() => {
@@ -154,45 +188,14 @@ export function RangeNav({
                 {m}
               </button>
             )
-          })
-        ) : (
+          })}
+        </div>
+
+        {/* Regular tabs: hoy / anteayer / week days (hidden when 12-month picker is expanded) */}
+        {!showMonthPicker && (
           <>
-            <div className="menu-anchor" ref={anchorRef}>
-              <button
-                ref={chipRef}
-                type="button"
-                role="tab"
-                className={`tab${!isCurrentMonth ? ' tab--custom-month' : ''}`}
-                aria-selected={periodSelected}
-                aria-haspopup="menu"
-                aria-expanded={open}
-                onClick={handleMainTabClick}
-              >
-                {mainTabLabel}
-              </button>
-
-              {open && (
-                <div className="menu" role="menu" aria-label="Elegir rango">
-                  {SCOPES.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      role="menuitemradio"
-                      aria-checked={scope === option.value}
-                      className="menu__item"
-                      onClick={() => pickScope(option.value)}
-                    >
-                      {option.label}
-                      {scope === option.value && <CheckIcon />}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
             {scope === 'mes' ? (
               <>
-                {/* Expanding tabs: anteayer + ayer */}
                 <div className={`nav__extra${expanded ? ' nav__extra--open' : ''}`} aria-hidden={!expanded}>
                   <button
                     type="button"
