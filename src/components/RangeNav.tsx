@@ -42,6 +42,7 @@ export function RangeNav({
   const [showMonthPicker, setShowMonthPicker] = useState(false)
   const anchorRef = useRef<HTMLDivElement>(null)
   const scrollerRef = useRef<HTMLDivElement>(null)
+  const monthsRef = useRef<HTMLDivElement>(null)
   const chipRef = useRef<HTMLButtonElement>(null)
 
   const now = new Date()
@@ -55,6 +56,14 @@ export function RangeNav({
       setExpanded(false)
     }
   }, [tab])
+
+  // Reset scroll to left when month picker opens so the selected month on the left is always visible
+  useEffect(() => {
+    if (showMonthPicker) {
+      if (scrollerRef.current) scrollerRef.current.scrollLeft = 0
+      if (monthsRef.current) monthsRef.current.scrollLeft = 0
+    }
+  }, [showMonthPicker])
 
   // Close scope dropdown on outside click or Esc
   useEffect(() => {
@@ -130,10 +139,14 @@ export function RangeNav({
 
   const mainTabLabel = isCurrentMonth ? 'mes' : MONTH_ABBRS[anchor.getMonth()]
 
+  // Re-order months so the selected month is ALWAYS first on the left
+  const selectedMonthIndex = anchor.getMonth()
+  const orderedMonthIndices = Array.from({ length: 12 }, (_, i) => (selectedMonthIndex + i) % 12)
+
   return (
     <nav className="nav" aria-label="Periodo">
       <div className="nav__scroller" role="tablist" aria-label="Rango de movimientos" ref={scrollerRef}>
-        {/* Main single month/scope button (collapses when 12-month strip opens so month is never duplicated) */}
+        {/* Main single month/scope button (collapses when 12-month strip opens) */}
         <div className={`nav__main-tab${showMonthPicker ? ' nav__main-tab--collapsed' : ''}`}>
           <div className="menu-anchor" ref={anchorRef}>
             <button
@@ -169,11 +182,16 @@ export function RangeNav({
           </div>
         </div>
 
-        {/* 12-month picker strip (expands smoothly taking the place of the main button) */}
-        <div className={`nav__months${showMonthPicker ? ' nav__months--open' : ''}`} aria-hidden={!showMonthPicker}>
-          {MONTH_ABBRS.map((m, index) => {
-            const isSelected = anchor.getMonth() === index
-            const isTodayMonth = now.getMonth() === index && anchor.getFullYear() === now.getFullYear()
+        {/* 12-month picker strip: ordered so the selected month is ALWAYS on the far left */}
+        <div
+          ref={monthsRef}
+          className={`nav__months${showMonthPicker ? ' nav__months--open' : ''}`}
+          aria-hidden={!showMonthPicker}
+        >
+          {orderedMonthIndices.map((monthIndex) => {
+            const m = MONTH_ABBRS[monthIndex]
+            const isSelected = anchor.getMonth() === monthIndex
+            const isTodayMonth = now.getMonth() === monthIndex && anchor.getFullYear() === now.getFullYear()
             return (
               <button
                 key={m}
@@ -183,7 +201,7 @@ export function RangeNav({
                 className={`tab${isSelected ? ' tab--selected-month' : ''}${isTodayMonth ? ' tab--today-month' : ''}`}
                 aria-selected={isSelected}
                 onClick={() => {
-                  onAnchorChange(new Date(anchor.getFullYear(), index, 1))
+                  onAnchorChange(new Date(anchor.getFullYear(), monthIndex, 1))
                   onTabChange('periodo')
                   setShowMonthPicker(false)
                 }}
