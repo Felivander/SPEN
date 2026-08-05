@@ -37,6 +37,8 @@ export interface Settings {
    */
   proxyUrl: string
   currency: string
+  /** When false the currency symbol is hidden in all amounts. */
+  showCurrency: boolean
   locale: string
   supabaseUrl?: string
   supabaseAnonKey?: string

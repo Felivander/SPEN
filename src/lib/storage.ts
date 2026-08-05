@@ -10,6 +10,7 @@ export const DEFAULT_SETTINGS: Settings = {
   // Build-time default so a deployed proxy needs no per-device setup.
   proxyUrl: import.meta.env.VITE_LLM_PROXY_URL ?? '',
   currency: '$',
+  showCurrency: true,
   locale: 'es-AR',
   supabaseUrl: import.meta.env.VITE_SUPABASE_URL ?? '',
   supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY ?? '',

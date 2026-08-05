@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>Gestión de gastos e ingresos conversacional en español argentino.</strong><br />
-  100% privado · Sin servidores · PWA Instalable · Diseño minimalista Braun
+  100% privado · Sin servidores · PWA Instalable · Diseño minimalista
 </p>
 
 <p align="center">
@@ -46,7 +46,7 @@
 - 🏷️ **Edición de Categorías**: Tocá cualquier item para cambiar su categoría en tiempo real con selector horizontal de chips con *glassmorphism*.
 - 🤏 **Gestos Táctiles Naturales**: Deslizá hacia abajo para cerrar Ajustes con resistencia elástica (*rubber-band*), o arrastrá de izquierda a derecha para cerrar el Historial.
 - 🔒 **100% Funcional Offline (Local-First)**: Funciona sin conexión con `localStorage`. Si iniciás sesión, tus datos se respaldan en Supabase.
-- 🎨 **Estética Dieter Rams**: Paleta cálida basada en OKLCH, tipografía Helvetica limpia, sin sombras pesadas y color acento naranja Braun.
+- 🎨 **Diseño Minimalista**: Paleta cálida basada en OKLCH, tipografía Helvetica limpia, sin sombras pesadas y color acento naranja.
 
 ---
 

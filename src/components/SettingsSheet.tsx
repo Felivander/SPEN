@@ -268,37 +268,21 @@ export function SettingsSheet({
           </span>
         </label>
 
-        <label className="field">
-          <span className="field__label">Proxy (opcional)</span>
-          <input
-            className="input"
-            type="url"
-            value={settings.proxyUrl}
-            onChange={(e) => onChange({ proxyUrl: e.target.value })}
-            placeholder="https://tu-app.vercel.app/api/parse"
-            autoComplete="off"
-            autoCorrect="off"
-            spellCheck={false}
-          />
-          <span className="field__hint">
-            Endpoint propio que reenvía a Groq con la clave del lado del servidor. Si lo
-            completás, se usa en lugar de la clave local.
-          </span>
-        </label>
 
         {/* ----- Formato --------------------------------------------------- */}
 
-        <label className="field">
-          <span className="field__label">Símbolo</span>
-          <input
-            className="input"
-            type="text"
-            value={settings.currency}
-            onChange={(e) => onChange({ currency: e.target.value.slice(0, 4) })}
-            placeholder="$"
-            maxLength={4}
-          />
-        </label>
+        <div className="field field--row">
+          <span className="field__label" style={{ flex: 1 }}>Mostrar símbolo ($)</span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={settings.showCurrency}
+            className={`toggle${settings.showCurrency ? ' toggle--on' : ''}`}
+            onClick={() => onChange({ showCurrency: !settings.showCurrency })}
+          >
+            <span className="toggle__thumb" />
+          </button>
+        </div>
 
         {/* ----- Datos y Respaldo ------------------------------------------- */}
 

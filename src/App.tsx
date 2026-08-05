@@ -191,7 +191,7 @@ export default function App() {
         }
 
         const summary = created
-          .map((m) => `${m.kind === 'ingreso' ? '+' : '−'}${formatMoney(m.amount, settings.currency, settings.locale).replace('−', '')}`)
+          .map((m) => `${m.kind === 'ingreso' ? '+' : '−'}${formatMoney(m.amount, currencySymbol, settings.locale).replace('−', '')}`)
           .join('  ')
 
         setNote({
@@ -247,6 +247,9 @@ export default function App() {
 
   const groupByDay = tab === 'periodo'
 
+  // Respects the "show symbol" toggle — pass '' to hide it everywhere
+  const currencySymbol = settings.showCurrency ? settings.currency : ''
+
   /* --------------------------------------------------------------- view -- */
 
   return (
@@ -277,7 +280,7 @@ export default function App() {
       <BalanceCard
         balance={balance}
         todayCount={todayCount}
-        currency={settings.currency}
+        currency={currencySymbol}
         locale={settings.locale}
       />
 
@@ -287,7 +290,7 @@ export default function App() {
         onScopeChange={handleScopeChange}
         onTabChange={setTab}
         selectedNet={visibleNet}
-        currency={settings.currency}
+        currency={currencySymbol}
         locale={settings.locale}
       />
 
@@ -301,7 +304,7 @@ export default function App() {
         <MovementList
           movements={visible}
           groupByDay={groupByDay}
-          currency={settings.currency}
+          currency={currencySymbol}
           locale={settings.locale}
           onDelete={handleDelete}
           onUpdateCategory={handleUpdateCategory}
@@ -332,7 +335,7 @@ export default function App() {
       {historyOpen && (
         <HistoryPage
           movements={movements}
-          currency={settings.currency}
+          currency={currencySymbol}
           locale={settings.locale}
           onClose={() => setHistoryOpen(false)}
         />
