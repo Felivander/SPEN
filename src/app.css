@@ -314,6 +314,8 @@
 
 .list {
   flex: 1 1 auto;
+  min-height: 0;
+  min-block-size: 0;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -323,7 +325,7 @@
   /* The chat bar floats over this column, so the list reserves exactly its
      measured height (set from JS — it changes when the confirmation line
      appears) plus a little air. Without this the last row hides under it. */
-  padding-block-end: calc(var(--chat-h, 4.25rem) + 0.75rem);
+  padding-block-end: calc(var(--chat-h, 4.25rem) + 1.25rem);
 }
 
 .list__daylabel {
@@ -531,6 +533,11 @@
   padding-inline: var(--gutter);
   padding-block: 0.875rem 0.625rem;
   padding-bottom: max(0.625rem, env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+
+.chat > * {
+  pointer-events: auto;
 }
 
 /* Firefox has backdrop-filter behind a flag on some builds, and any browser
