@@ -38,12 +38,29 @@ export function useDragToClose(
       const dx = e.clientX - startRef.current.x
       const dy = e.clientY - startRef.current.y
 
+      // If sheet is scrolled down (scrollTop > 0), allow standard content scrolling
+      if (direction === 'down' && el.scrollTop > 0) {
+        startRef.current = null
+        return
+      }
+
+      // If swiping upwards when at top, allow normal downward scrolling
+      if (direction === 'down' && !draggingRef.current && dy < -5) {
+        startRef.current = null
+        return
+      }
+
       const primary   = direction === 'down' ? dy   : dx
       const secondary = direction === 'down' ? Math.abs(dx) : Math.abs(dy)
 
       // Abort if gesture goes too far off-axis before committing
       if (!draggingRef.current && secondary > AXIS_LOCK) {
         startRef.current = null
+        return
+      }
+
+      // Only drag down if moving in closing direction or rubberbanding slightly
+      if (!draggingRef.current && primary < 0) {
         return
       }
 
@@ -93,6 +110,7 @@ export function useDragToClose(
     const onPointerUp = (e: PointerEvent) => {
       if (!startRef.current || !draggingRef.current) {
         startRef.current = null
+        restoreOverflow()
         return
       }
 
