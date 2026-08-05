@@ -41,10 +41,11 @@
 ## ⚡ Características Clave
 
 - 🗣️ **Parser Conversacional Rioplatense**: Entiende `15 mil`, `2 lucas`, `5k`, `2 palos`, palabras escritas (`dos mil`), cobros (`cobré 180k`), y fechas relativas (`ayer`, `anteayer`, `12/3`).
+- ☁️ **Sincronización en la Nube con Supabase & Google**: Iniciá sesión con tu cuenta de Google para respaldar y sincronizar automáticamente tus gastos entre múltiples dispositivos.
 - 🗓️ **Filtros por Fecha**: Si tenés seleccionada la pestaña `ayer` o `anteayer`, los nuevos gastos ingresados se asignan automáticamente a ese día.
 - 🏷️ **Edición de Categorías**: Tocá cualquier item para cambiar su categoría en tiempo real con selector horizontal de chips con *glassmorphism*.
 - 🤏 **Gestos Táctiles Naturales**: Deslizá hacia abajo para cerrar Ajustes con resistencia elástica (*rubber-band*), o arrastrá de izquierda a derecha para cerrar el Historial.
-- 🔒 **100% Privado y Offline**: Guardado en `localStorage`. Exportación e importación completa en `.json` en 1 clic.
+- 🔒 **100% Funcional Offline (Local-First)**: Funciona sin conexión con `localStorage`. Si iniciás sesión, tus datos se respaldan en Supabase.
 - 🎨 **Estética Dieter Rams**: Paleta cálida basada en OKLCH, tipografía Helvetica limpia, sin sombras pesadas y color acento naranja Braun.
 
 ---

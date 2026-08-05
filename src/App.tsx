@@ -30,11 +30,22 @@ import {
   saveSettings,
 } from './lib/storage'
 import { applyTheme, watchSystemTheme } from './lib/theme'
+import {
+  clearRemoteMovements,
+  deleteRemoteMovement,
+  fetchRemoteMovements,
+  onAuthStateChange,
+  signInWithGoogle,
+  signOut,
+  syncMovementsToCloud,
+} from './lib/supabase'
+import type { User } from '@supabase/supabase-js'
 import type { Movement, Scope, Settings, Tab } from './types'
 
 export default function App() {
   const [movements, setMovements] = useState<Movement[]>(loadMovements)
   const [settings, setSettings] = useState<Settings>(loadSettings)
+  const [user, setUser] = useState<User | null>(null)
 
   const [scope, setScope] = useState<Scope>('mes')
   const [tab, setTab] = useState<Tab>('periodo')
@@ -47,6 +58,28 @@ export default function App() {
   const [historyOpen, setHistoryOpen] = useState(false)
   /** Measured height of the floating chat bar, so the list can clear it. */
   const [chatHeight, setChatHeight] = useState(68)
+
+  // Listen to Supabase Auth state and auto-sync movements on login
+  useEffect(() => {
+    return onAuthStateChange((_session, currentUser) => {
+      setUser(currentUser)
+      if (currentUser) {
+        // Sync local movements to cloud and download remote movements
+        void (async () => {
+          const remote = await fetchRemoteMovements(currentUser.id)
+          setMovements((local) => {
+            const map = new Map<string, Movement>()
+            // Put remote first, then override with local to preserve recent edits
+            for (const m of remote) map.set(m.id, m)
+            for (const m of local) map.set(m.id, m)
+            const merged = Array.from(map.values())
+            void syncMovementsToCloud(currentUser.id, merged)
+            return merged
+          })
+        })()
+      }
+    })
+  }, [])
 
   useEffect(() => saveMovements(movements), [movements])
   useEffect(() => saveSettings(settings), [settings])
@@ -145,7 +178,11 @@ export default function App() {
           createdAt: Date.now() + i, // keeps stable ordering within one batch
         }))
 
-        setMovements((prev) => [...prev, ...created])
+        setMovements((prev) => {
+          const next = [...prev, ...created]
+          if (user) void syncMovementsToCloud(user.id, created)
+          return next
+        })
 
         // Show the entries where they landed, if they landed outside the view.
         const first = created[0]
@@ -172,18 +209,34 @@ export default function App() {
         setBusy(false)
       }
     },
-    [settings, anchor, scope],
+    [settings, anchor, scope, user],
   )
 
   const handleDelete = useCallback((id: string) => {
     setMovements((prev) => prev.filter((m) => m.id !== id))
-  }, [])
+    if (user) void deleteRemoteMovement(user.id, id)
+  }, [user])
 
   const handleUpdateCategory = useCallback((id: string, category: string) => {
-    setMovements((prev) =>
-      prev.map((m) => (m.id === id ? { ...m, category } : m)),
-    )
-  }, [])
+    setMovements((prev) => {
+      const next = prev.map((m) => (m.id === id ? { ...m, category } : m))
+      if (user) {
+        const updated = next.find((m) => m.id === id)
+        if (updated) void syncMovementsToCloud(user.id, [updated])
+      }
+      return next
+    })
+  }, [user])
+
+  const handleImportMovements = useCallback((imported: Movement[]) => {
+    setMovements(imported)
+    if (user) void syncMovementsToCloud(user.id, imported)
+  }, [user])
+
+  const handleClearMovements = useCallback(() => {
+    setMovements([])
+    if (user) void clearRemoteMovements(user.id)
+  }, [user])
 
   // Clear the confirmation line after a beat so it doesn't linger as chrome.
   useEffect(() => {
@@ -266,9 +319,12 @@ export default function App() {
         <SettingsSheet
           settings={settings}
           movements={movements}
+          user={user}
+          onSignInWithGoogle={() => void signInWithGoogle()}
+          onSignOut={() => void signOut()}
           onChange={(patch) => setSettings((prev) => ({ ...prev, ...patch }))}
-          onImport={(imported) => setMovements(imported)}
-          onClear={() => setMovements([])}
+          onImport={handleImportMovements}
+          onClear={handleClearMovements}
           onClose={() => setSheetOpen(false)}
         />
       )}

@@ -3,7 +3,8 @@ import { GROQ_MODELS, hasLLM } from '../lib/llm'
 import { exportJSON, importJSON } from '../lib/storage'
 import { useDragToClose } from '../lib/useDragToClose'
 import type { Movement, Settings, Theme } from '../types'
-import { ChevronDownPlain, CloseIcon } from './icons'
+import type { User } from '@supabase/supabase-js'
+import { ChevronDownPlain, CloseIcon, GoogleIcon } from './icons'
 
 const THEMES: { value: Theme; label: string }[] = [
   { value: 'system', label: 'Sistema' },
@@ -14,6 +15,9 @@ const THEMES: { value: Theme; label: string }[] = [
 interface Props {
   settings: Settings
   movements: Movement[]
+  user: User | null
+  onSignInWithGoogle: () => void
+  onSignOut: () => void
   onChange: (patch: Partial<Settings>) => void
   onImport: (movements: Movement[]) => void
   onClear: () => void
@@ -23,6 +27,9 @@ interface Props {
 export function SettingsSheet({
   settings,
   movements,
+  user,
+  onSignInWithGoogle,
+  onSignOut,
   onChange,
   onImport,
   onClear,
@@ -111,6 +118,57 @@ export function SettingsSheet({
               : 'Leyendo con IA (Groq)'
             : 'Leyendo sin IA — modo local'}
         </p>
+
+        {/* ----- Cuenta y Nube -------------------------------------------- */}
+        <div className="field">
+          <span className="field__label">Cuenta y Nube</span>
+          {user ? (
+            <div className="auth-card">
+              <div className="auth-card__user">
+                {user.user_metadata?.avatar_url ? (
+                  <img
+                    src={user.user_metadata.avatar_url}
+                    alt=""
+                    className="auth-card__avatar"
+                  />
+                ) : (
+                  <div className="auth-card__avatar-placeholder">
+                    {(user.email?.[0] ?? 'U').toUpperCase()}
+                  </div>
+                )}
+                <div className="auth-card__info">
+                  <span className="auth-card__name">
+                    {user.user_metadata?.full_name ?? user.email ?? 'Usuario'}
+                  </span>
+                  <span className="auth-card__status">
+                    ✓ Sincronizado en Supabase
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="btn btn--subtle btn--sm"
+                onClick={onSignOut}
+              >
+                Cerrar sesión
+              </button>
+            </div>
+          ) : (
+            <div className="auth-card auth-card--logged-out">
+              <p className="auth-card__hint">
+                Iniciá sesión para respaldar tus gastos en la nube y acceder desde cualquier celular o PC.
+              </p>
+              <button
+                type="button"
+                className="btn btn--google"
+                onClick={onSignInWithGoogle}
+              >
+                <GoogleIcon size={18} />
+                <span>Continuar con Google</span>
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* ----- Apariencia ------------------------------------------------ */}
 
