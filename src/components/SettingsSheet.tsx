@@ -29,10 +29,11 @@ export function SettingsSheet({
   onClose,
 }: Props) {
   const sheetRef = useRef<HTMLDivElement>(null)
-  const fileRef = useRef<HTMLInputElement>(null)
+  const scrimRef  = useRef<HTMLDivElement>(null)
+  const fileRef   = useRef<HTMLInputElement>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
 
-  useDragToClose(sheetRef, onClose, 'down')
+  useDragToClose(sheetRef, onClose, 'down', scrimRef)
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -79,7 +80,7 @@ export function SettingsSheet({
 
   return (
     <>
-      <div className="scrim" onClick={onClose} aria-hidden="true" />
+      <div className="scrim" ref={scrimRef} onClick={onClose} aria-hidden="true" />
       <div
         className="sheet"
         role="dialog"
