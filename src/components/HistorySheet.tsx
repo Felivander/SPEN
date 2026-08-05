@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
+import { useDragToClose } from '../lib/useDragToClose'
 import { formatSigned, formatMoney } from '../lib/format'
 import { fromISODate, isSameMonth, monthLabel, MONTHS, todayISO, WEEKDAYS, weekdayIndex } from '../lib/dates'
 import { CATEGORIES } from '../lib/categories'
@@ -157,8 +158,11 @@ function ResumenTab({ movements, currency, locale }: Omit<Props, 'onClose'>) {
 /* ------------------------------------------------------------------ Page -- */
 
 export function HistoryPage({ movements, currency, locale, onClose }: Props) {
+  const pageRef = useRef<HTMLDivElement>(null)
   const [tab, setTab] = useState<HistTab>('todo')
   const [monthAnchor, setMonthAnchor] = useState<Date>(() => new Date())
+
+  useDragToClose(pageRef, onClose, 'right')
 
   const monthMovements = useMemo(() => {
     return movements.filter((m) => isSameMonth(m.date, monthAnchor))
@@ -178,7 +182,7 @@ export function HistoryPage({ movements, currency, locale, onClose }: Props) {
   }
 
   return (
-    <div className="hist-page" role="region" aria-label="Historial de movimientos">
+    <div className="hist-page" role="region" aria-label="Historial de movimientos" ref={pageRef}>
       {/* Header — back button + title */}
       <header className="hist-page__header">
         <button

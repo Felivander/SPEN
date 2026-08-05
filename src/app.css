@@ -80,8 +80,9 @@
 .dots {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-evenly;
   margin-block-start: 1.125rem;
+  padding-inline: 3rem;
 }
 
 .dot {
@@ -217,16 +218,20 @@
 .nav__extra {
   display: flex;
   align-items: center;
+  gap: 1rem;
+  margin-inline-start: -1rem; /* cancel the scroller gap when collapsed */
   overflow: hidden;
   max-width: 0;
   opacity: 0;
   transition:
     max-width 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    margin-inline-start 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
     opacity 180ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .nav__extra--open {
-  max-width: 16rem; /* enough for anteayer + ayer */
+  max-width: 18rem;
+  margin-inline-start: 0; /* restore normal gap */
   opacity: 1;
 }
 
@@ -309,6 +314,8 @@
 
 .list {
   flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
@@ -459,12 +466,12 @@
 /* ----------------------------------------------------------------- empty -- */
 
 .empty {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  min-block-size: 12rem;
   padding: 2rem 1rem;
   text-align: center;
   text-wrap: pretty;

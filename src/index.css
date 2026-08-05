@@ -28,7 +28,7 @@
   --l-rule: oklch(0.845 0.005 85); /* hairlines now carry the structure */
   --l-rule-strong: oklch(0.775 0.005 85);
   --l-accent: oklch(0.635 0.187 42); /* Braun orange — 3.09:1 as a mark  */
-  --l-accent-text: oklch(0.535 0.163 40); /* orange as text — 4.64:1 on paper */
+  --l-accent-text: oklch(0.635 0.187 42); /* same orange as the accent fill */
   --l-accent-wash: oklch(0.635 0.187 42 / 0.14);
   --l-on-accent: oklch(0.985 0.004 85);
   --l-scrim: oklch(0.2 0.01 85 / 0.32);
@@ -42,7 +42,7 @@
   --d-rule: oklch(0.335 0.005 85);
   --d-rule-strong: oklch(0.44 0.005 85);
   --d-accent: oklch(0.71 0.19 44); /* 6.04:1 as a mark */
-  --d-accent-text: oklch(0.78 0.17 46); /* 8.25:1 on paper */
+  --d-accent-text: oklch(0.71 0.19 44); /* same orange as the accent fill */
   --d-accent-wash: oklch(0.71 0.19 44 / 0.18);
   --d-on-accent: oklch(0.16 0.02 45); /* 7.04:1 on the accent fill */
   --d-scrim: oklch(0.08 0.01 85 / 0.6);

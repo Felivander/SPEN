@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { GROQ_MODELS, hasLLM } from '../lib/llm'
 import { exportJSON, importJSON } from '../lib/storage'
+import { useDragToClose } from '../lib/useDragToClose'
 import type { Movement, Settings, Theme } from '../types'
 import { ChevronDownPlain, CloseIcon } from './icons'
 
@@ -30,6 +31,8 @@ export function SettingsSheet({
   const sheetRef = useRef<HTMLDivElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
+
+  useDragToClose(sheetRef, onClose, 'down')
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
