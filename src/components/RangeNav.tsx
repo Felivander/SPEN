@@ -133,40 +133,43 @@ export function RangeNav({
   return (
     <nav className="nav" aria-label="Periodo">
       <div className="nav__scroller" role="tablist" aria-label="Rango de movimientos" ref={scrollerRef}>
-        <div className="menu-anchor" ref={anchorRef}>
-          <button
-            ref={chipRef}
-            type="button"
-            role="tab"
-            className={`tab${!isCurrentMonth ? ' tab--custom-month' : ''}`}
-            aria-selected={periodSelected}
-            aria-haspopup="menu"
-            aria-expanded={open}
-            onClick={handleMainTabClick}
-          >
-            {mainTabLabel}
-          </button>
+        {/* Main single month/scope button (collapses when 12-month strip opens so month is never duplicated) */}
+        <div className={`nav__main-tab${showMonthPicker ? ' nav__main-tab--collapsed' : ''}`}>
+          <div className="menu-anchor" ref={anchorRef}>
+            <button
+              ref={chipRef}
+              type="button"
+              role="tab"
+              className={`tab${!isCurrentMonth ? ' tab--custom-month' : ''}`}
+              aria-selected={periodSelected}
+              aria-haspopup="menu"
+              aria-expanded={open}
+              onClick={handleMainTabClick}
+            >
+              {mainTabLabel}
+            </button>
 
-          {open && (
-            <div className="menu" role="menu" aria-label="Elegir rango">
-              {SCOPES.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  role="menuitemradio"
-                  aria-checked={scope === option.value}
-                  className="menu__item"
-                  onClick={() => pickScope(option.value)}
-                >
-                  {option.label}
-                  {scope === option.value && <CheckIcon />}
-                </button>
-              ))}
-            </div>
-          )}
+            {open && (
+              <div className="menu" role="menu" aria-label="Elegir rango">
+                {SCOPES.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    role="menuitemradio"
+                    aria-checked={scope === option.value}
+                    className="menu__item"
+                    onClick={() => pickScope(option.value)}
+                  >
+                    {option.label}
+                    {scope === option.value && <CheckIcon />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Expanding 12-month picker with same smooth slide-in transition as anteayer/ayer */}
+        {/* 12-month picker strip (expands smoothly taking the place of the main button) */}
         <div className={`nav__months${showMonthPicker ? ' nav__months--open' : ''}`} aria-hidden={!showMonthPicker}>
           {MONTH_ABBRS.map((m, index) => {
             const isSelected = anchor.getMonth() === index
