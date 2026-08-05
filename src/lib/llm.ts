@@ -79,7 +79,7 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
  * Never trusts the model's shape. Every field is checked and, where the model
  * drifted, repaired locally rather than dropped.
  */
-function coerce(payload: unknown): ParsedResult {
+function coerce(payload: unknown, defaultDate?: string): ParsedResult {
   if (typeof payload !== 'object' || payload === null) {
     throw new Error('La respuesta del modelo no era un objeto.')
   }
@@ -107,7 +107,9 @@ function coerce(payload: unknown): ParsedResult {
         ? m.categoria
         : guessCategory(description, kind)
 
-    const date = typeof m.fecha === 'string' && ISO_DATE.test(m.fecha) ? m.fecha : todayISO()
+    const date = typeof m.fecha === 'string' && ISO_DATE.test(m.fecha)
+      ? (m.fecha === todayISO() && defaultDate ? defaultDate : m.fecha)
+      : (defaultDate || todayISO())
 
     movements.push({
       kind,
@@ -187,25 +189,26 @@ export interface ParseOutcome extends ParsedResult {
 export async function parseMessage(
   text: string,
   settings: Settings,
+  defaultDate?: string,
   timeoutMs = 15_000,
 ): Promise<ParseOutcome> {
-  if (!hasLLM(settings)) return parseLocal(text)
+  if (!hasLLM(settings)) return parseLocal(text, defaultDate)
 
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), timeoutMs)
 
   try {
     const payload = await callGroq(text, settings, controller.signal)
-    const result = coerce(payload)
+    const result = coerce(payload, defaultDate)
 
     // A model that found nothing may simply have missed an obvious amount.
     if (result.movements.length === 0) {
-      const local = parseLocal(text)
+      const local = parseLocal(text, defaultDate)
       if (local.movements.length > 0) return local
     }
     return result
   } catch (error) {
-    const local = parseLocal(text)
+    const local = parseLocal(text, defaultDate)
     const reason =
       error instanceof DOMException && error.name === 'AbortError'
         ? 'La IA tardó demasiado'

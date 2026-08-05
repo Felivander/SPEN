@@ -46,7 +46,7 @@ const AMOUNT_RE =
   /\$?\s?(\d{1,3}(?:[.\s]\d{3})+(?:,\d{1,2})?|\d+(?:[.,]\d{1,2})?)\s*(k|mil|lucas?|m|palos?|millones?|millon)?\b/i
 
 /** Relative day words, mapped to a concrete ISO date. */
-function resolveDate(text: string): string {
+function resolveDate(text: string, defaultDate?: string): string {
   const t = strip(text)
   const now = new Date()
   if (/\bantea?yer\b|\banteayer\b/.test(t)) return toISODate(addDays(now, -2))
@@ -63,7 +63,7 @@ function resolveDate(text: string): string {
     const d = new Date(year, month, day)
     if (!Number.isNaN(d.getTime())) return toISODate(d)
   }
-  return todayISO()
+  return defaultDate || todayISO()
 }
 
 /** Strips the amount, filler words and date words to leave a usable label. */
@@ -110,7 +110,7 @@ function splitChunks(input: string): string[] {
  * is unavailable. Understands es-AR amount notation in digits and in words,
  * relative dates, and several movements in one message.
  */
-export function parseLocal(input: string): ParsedResult {
+export function parseLocal(input: string, defaultDate?: string): ParsedResult {
   const chunks = splitChunks(input)
   const movements: ParsedResult['movements'] = []
 
@@ -150,7 +150,7 @@ export function parseLocal(input: string): ParsedResult {
       amount,
       description,
       category: guessCategory(description, kind),
-      date: resolveDate(chunk),
+      date: resolveDate(chunk, defaultDate),
     })
   }
 

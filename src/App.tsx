@@ -108,6 +108,16 @@ export default function App() {
     [visible],
   )
 
+  const activeTargetDate = useMemo(() => {
+    if (tab === 'ayer') return toISODate(addDays(new Date(), -1))
+    if (tab === 'anteayer') return toISODate(addDays(new Date(), -2))
+    if (typeof tab === 'number') {
+      const target = addDays(startOfWeek(anchor), tab)
+      return toISODate(target)
+    }
+    return todayISO()
+  }, [tab, anchor])
+
   /* ------------------------------------------------------------ actions -- */
 
   const handleScopeChange = useCallback((next: Scope) => {
@@ -122,7 +132,7 @@ export default function App() {
       setBusy(true)
       setNote(null)
       try {
-        const result = await parseMessage(text, settings)
+        const result = await parseMessage(text, settings, activeTargetDate)
 
         if (result.movements.length === 0) {
           setNote({ text: result.reply, tone: 'error' })
