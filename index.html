@@ -1,6 +1,12 @@
 <!doctype html>
 <html lang="es" dir="ltr">
   <head>
+    <script>
+      // Automatically redirect old uppercase /SPEN/ path to new lowercase /spens/
+      if (window.location.pathname.includes('/SPEN')) {
+        window.location.replace(window.location.href.replace(/\/SPEN\/?/g, '/spens/'));
+      }
+    </script>
     <meta charset="UTF-8" />
     <!-- viewport-fit=cover is what unlocks env(safe-area-inset-*) on iPhone.
          No maximum-scale: pinch zoom must stay available. -->
