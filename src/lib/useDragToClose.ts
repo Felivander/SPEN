@@ -47,6 +47,12 @@ export function useDragToClose(
         return
       }
 
+      // First committed move — freeze overflow so the panel moves as a rigid block
+      if (!draggingRef.current) {
+        el.style.overflowY = 'hidden'
+        el.style.overflowX = 'hidden'
+      }
+
       draggingRef.current = true
 
       let offset: number
@@ -56,7 +62,6 @@ export function useDragToClose(
       } else {
         // Opposite direction — rubber-band resistance.
         // Formula: the further you pull, the less it moves.
-        // At 0 → 1:1, approaches ~0.15:1 asymptotically.
         const resistance = direction === 'down' ? window.innerHeight : window.innerWidth
         offset = primary / (1 + Math.abs(primary) / (resistance * 0.25))
       }
@@ -68,7 +73,7 @@ export function useDragToClose(
 
       el.style.transition = 'none'
       el.style.transform  = translate
-      el.style.opacity    = ''          // always full opacity during drag
+      el.style.opacity    = ''
 
       // Backdrop fades from 1 → 0 over the full viewport span (only on closing drag)
       const bd = backdrop?.current
@@ -78,6 +83,11 @@ export function useDragToClose(
         bd.style.transition = 'none'
         bd.style.opacity    = String(1 - progress)
       }
+    }
+
+    const restoreOverflow = () => {
+      el.style.overflowY = ''
+      el.style.overflowX = ''
     }
 
     const onPointerUp = (e: PointerEvent) => {
@@ -106,10 +116,11 @@ export function useDragToClose(
         }
         el.addEventListener('transitionend', onClose, { once: true })
       } else {
-        // Snap back to original position
+        // Snap back to original position, then restore overflow
         el.style.transition = `transform 280ms ${EASING}`
         el.style.transform  = ''
         el.style.opacity    = ''
+        el.addEventListener('transitionend', restoreOverflow, { once: true })
         if (bd) {
           bd.style.transition = `opacity 280ms ${EASING}`
           bd.style.opacity    = ''
