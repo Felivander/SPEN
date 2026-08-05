@@ -49,6 +49,8 @@ export function SettingsSheet({
       if (e.key === 'Escape') onClose()
     }
     document.addEventListener('keydown', onKeyDown)
+    // Always show the top of the sheet when it opens
+    if (sheetRef.current) sheetRef.current.scrollTop = 0
     sheetRef.current?.focus()
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [onClose])
