@@ -46,27 +46,35 @@ export function useDragToClose(
         startRef.current = null
         return
       }
-      // Only track intended direction
-      if (primary < 0) {
-        startRef.current = null
-        return
-      }
 
       draggingRef.current = true
 
+      let offset: number
+      if (primary >= 0) {
+        // Closing direction — 1:1 follow
+        offset = primary
+      } else {
+        // Opposite direction — rubber-band resistance.
+        // Formula: the further you pull, the less it moves.
+        // At 0 → 1:1, approaches ~0.15:1 asymptotically.
+        const resistance = direction === 'down' ? window.innerHeight : window.innerWidth
+        offset = primary / (1 + Math.abs(primary) / (resistance * 0.25))
+      }
+
       // Translate the panel — no opacity change so colours stay vivid
       const translate = direction === 'down'
-        ? `translateY(${primary}px)`
-        : `translateX(${primary}px)`
+        ? `translateY(${offset}px)`
+        : `translateX(${offset}px)`
 
       el.style.transition = 'none'
       el.style.transform  = translate
       el.style.opacity    = ''          // always full opacity during drag
 
-      // Backdrop fades from 1 → 0 as drag approaches threshold
+      // Backdrop fades from 1 → 0 over the full viewport span (only on closing drag)
       const bd = backdrop?.current
       if (bd) {
-        const progress = Math.min(primary / THRESHOLD, 1)
+        const viewportSpan = direction === 'down' ? window.innerHeight : window.innerWidth
+        const progress = primary > 0 ? Math.min(primary / viewportSpan, 1) : 0
         bd.style.transition = 'none'
         bd.style.opacity    = String(1 - progress)
       }
