@@ -98,14 +98,6 @@ export function HistoryIcon({ size = 20, strokeWidth = 2 }: IconProps) {
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      {/* 18 units, not 16 and not 20.
-          Iconoir's Circle spans 20 of the 24-unit grid, so a 16-unit square
-          rendered at the same `size` came out ~20% smaller. Matching it at 20
-          would overshoot the other way: a square of side d carries ~27% more
-          area than a circle of diameter d, so equal geometry reads heavier.
-          18 against the circle's 20 is the usual optical keyline pair — the
-          same ratio Material's icon grid uses — and lands them at the same
-          apparent size. Corner radius scales with it (3 → 3.5). */}
       <rect x="3" y="3" width="18" height="18" rx="3.5" />
     </svg>
   )
