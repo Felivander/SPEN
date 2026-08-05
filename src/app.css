@@ -704,6 +704,30 @@
   cursor: grabbing;
 }
 
+.sheet__sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  /* Pull back to cover top & side padding of the sheet */
+  margin-inline: -1rem;
+  margin-block-start: -0.75rem;
+  padding-inline: 1rem;
+  padding-block-start: 0.75rem;
+  padding-block-end: 0.75rem;
+  /* Frosted glass background */
+  background: color-mix(in oklch, var(--paper) 75%, transparent);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  /* Gentle gradient mask fade at bottom edge */
+  -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+  cursor: grab;
+}
+
+.sheet__sticky-top:active {
+  cursor: grabbing;
+}
+
 .sheet__head {
   display: flex;
   align-items: center;
@@ -711,6 +735,7 @@
   gap: 1rem;
   margin-block-end: 0.25rem;
 }
+
 
 .sheet__title {
   font-size: var(--text-body);

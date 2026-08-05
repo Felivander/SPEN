@@ -100,15 +100,17 @@ export function SettingsSheet({
         tabIndex={-1}
         ref={sheetRef}
       >
-        <div className="sheet__grip" aria-hidden="true" ref={gripRef} />
+        <div className="sheet__sticky-top" ref={gripRef}>
+          <div className="sheet__grip" aria-hidden="true" />
 
-        <div className="sheet__head">
-          <h2 className="sheet__title" id="sheet-title">
-            Ajustes
-          </h2>
-          <button type="button" className="icon-btn" onClick={onClose} aria-label="Cerrar ajustes">
-            <CloseIcon />
-          </button>
+          <div className="sheet__head">
+            <h2 className="sheet__title" id="sheet-title">
+              Ajustes
+            </h2>
+            <button type="button" className="icon-btn" onClick={onClose} aria-label="Cerrar ajustes">
+              <CloseIcon />
+            </button>
+          </div>
         </div>
 
         <p className="sheet__status">
