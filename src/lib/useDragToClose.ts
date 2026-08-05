@@ -15,75 +15,83 @@ export function useDragToClose(
   direction: 'down' | 'right',
   backdrop?: React.RefObject<HTMLElement | null>,
 ) {
-  const startRef = useRef<{ x: number; y: number } | null>(null)
+  const startRef   = useRef<{ x: number; y: number } | null>(null)
   const draggingRef = useRef(false)
 
   useEffect(() => {
     const el = ref.current
     if (!el) return
 
-    const THRESHOLD = 80  // px — drag distance to trigger close
-    const AXIS_LOCK  = 20 // px — off-axis tolerance before giving up
+    const THRESHOLD  = 80   // px — drag distance to trigger close
+    const COMMIT_MIN = 10   // px — minimum primary movement to commit a drag gesture
+    const AXIS_LOCK  = 12   // px — off-axis tolerance before giving up
 
     const EASING = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
 
+    // ─── Pointer Down ──────────────────────────────────────────────────────────
     const onPointerDown = (e: PointerEvent) => {
+      // Ignore non-primary mouse buttons
       if (e.button !== 0 && e.pointerType === 'mouse') return
-      startRef.current = { x: e.clientX, y: e.clientY }
+      startRef.current  = { x: e.clientX, y: e.clientY }
       draggingRef.current = false
     }
 
+    // ─── Pointer Move ──────────────────────────────────────────────────────────
     const onPointerMove = (e: PointerEvent) => {
       if (!startRef.current) return
+
       const dx = e.clientX - startRef.current.x
       const dy = e.clientY - startRef.current.y
 
-      // If sheet is scrolled down (scrollTop > 0), allow standard content scrolling
-      if (direction === 'down' && el.scrollTop > 0) {
-        startRef.current = null
-        return
-      }
-
-      // If swiping upwards when at top, allow normal downward scrolling
-      if (direction === 'down' && !draggingRef.current && dy < -5) {
-        startRef.current = null
-        return
-      }
-
-      const primary   = direction === 'down' ? dy   : dx
+      const primary   = direction === 'down' ? dy  : dx
       const secondary = direction === 'down' ? Math.abs(dx) : Math.abs(dy)
 
-      // Abort if gesture goes too far off-axis before committing
-      if (!draggingRef.current && secondary > AXIS_LOCK) {
-        startRef.current = null
-        return
-      }
-
-      // Only drag down if moving in closing direction or rubberbanding slightly
-      if (!draggingRef.current && primary < 0) {
-        return
-      }
-
-      // First committed move — freeze overflow so the panel moves as a rigid block
       if (!draggingRef.current) {
-        el.style.overflowY = 'hidden'
-        el.style.overflowX = 'hidden'
+        // ── Not yet committed ──────────────────────────────────────────────────
+
+        // If user hasn't moved enough yet, wait
+        if (Math.abs(primary) < COMMIT_MIN && secondary < COMMIT_MIN) return
+
+        // Too much off-axis movement: let the browser handle normal scrolling
+        if (secondary > AXIS_LOCK && secondary > Math.abs(primary)) {
+          startRef.current = null
+          return
+        }
+
+        // Moving in the wrong direction (up on a bottom-sheet):
+        // cancel and let normal scroll take over
+        if (primary < 0) {
+          startRef.current = null
+          return
+        }
+
+        // For 'down' direction: only drag-to-close if sheet is scrolled to top
+        if (direction === 'down' && el.scrollTop > 0) {
+          startRef.current = null
+          return
+        }
+
+        // ── Commit to drag gesture ─────────────────────────────────────────────
+        draggingRef.current = true
+        el.style.overflowY  = 'hidden'
+        el.style.overflowX  = 'hidden'
+        el.setPointerCapture(e.pointerId)
       }
 
-      draggingRef.current = true
+      // ── Drag in progress ───────────────────────────────────────────────────
+      // Prevent default to stop scroll while dragging
+      e.preventDefault()
 
       let offset: number
       if (primary >= 0) {
         // Closing direction — 1:1 follow
         offset = primary
       } else {
-        // Opposite direction — rubber-band resistance.
-        // Formula: the further you pull, the less it moves.
+        // Opposite direction — rubber-band resistance
         const resistance = direction === 'down' ? window.innerHeight : window.innerWidth
         offset = primary / (1 + Math.abs(primary) / (resistance * 0.25))
       }
 
-      // Translate the panel — no opacity change so colours stay vivid
       const translate = direction === 'down'
         ? `translateY(${offset}px)`
         : `translateX(${offset}px)`
@@ -92,7 +100,7 @@ export function useDragToClose(
       el.style.transform  = translate
       el.style.opacity    = ''
 
-      // Backdrop fades from 1 → 0 over the full viewport span (only on closing drag)
+      // Backdrop fades from 1 → 0 over the full viewport span
       const bd = backdrop?.current
       if (bd) {
         const viewportSpan = direction === 'down' ? window.innerHeight : window.innerWidth
@@ -102,23 +110,28 @@ export function useDragToClose(
       }
     }
 
+    // ─── Restore ──────────────────────────────────────────────────────────────
     const restoreOverflow = () => {
       el.style.overflowY = ''
       el.style.overflowX = ''
     }
 
+    // ─── Pointer Up / Cancel ──────────────────────────────────────────────────
     const onPointerUp = (e: PointerEvent) => {
-      if (!startRef.current || !draggingRef.current) {
+      if (!startRef.current) return
+
+      if (!draggingRef.current) {
         startRef.current = null
-        restoreOverflow()
         return
       }
 
       const dx = e.clientX - startRef.current.x
       const dy = e.clientY - startRef.current.y
       const primary = direction === 'down' ? dy : dx
-      startRef.current  = null
+      startRef.current    = null
       draggingRef.current = false
+
+      try { el.releasePointerCapture(e.pointerId) } catch { /* ignore */ }
 
       const bd = backdrop?.current
 
@@ -146,17 +159,18 @@ export function useDragToClose(
       }
     }
 
-    el.addEventListener('pointerdown', onPointerDown)
-    window.addEventListener('pointermove',   onPointerMove)
-    window.addEventListener('pointerup',     onPointerUp)
-    window.addEventListener('pointercancel', onPointerUp)
+    // Use pointermove on the element (not window) so it only fires inside the panel
+    // passive:false lets us call preventDefault() when drag is committed
+    el.addEventListener('pointerdown',  onPointerDown)
+    el.addEventListener('pointermove',  onPointerMove, { passive: false })
+    el.addEventListener('pointerup',    onPointerUp)
+    el.addEventListener('pointercancel', onPointerUp)
 
     return () => {
-      el.removeEventListener('pointerdown', onPointerDown)
-      window.removeEventListener('pointermove',   onPointerMove)
-      window.removeEventListener('pointerup',     onPointerUp)
-      window.removeEventListener('pointercancel', onPointerUp)
+      el.removeEventListener('pointerdown',   onPointerDown)
+      el.removeEventListener('pointermove',   onPointerMove)
+      el.removeEventListener('pointerup',     onPointerUp)
+      el.removeEventListener('pointercancel', onPointerUp)
     }
   }, [ref, onClose, direction, backdrop])
 }
-
