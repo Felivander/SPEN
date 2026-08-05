@@ -1,12 +1,12 @@
 # Spens
 
 <p align="center">
-  <img src="docs/icon-512-preview.jpg" width="120" alt="Spens Logo" style="border-radius: 28px;" />
+  <img src="docs/icon-512-preview.jpg" width="100" alt="Spens Logo" style="border-radius: 22px;" />
 </p>
 
 <p align="center">
   <strong>Gestión de gastos e ingresos conversacional en español argentino.</strong><br />
-  100% privado · Funcionamiento offline · PWA Instalable · Diseño minimalista Braun
+  100% privado · Sin servidores · PWA Instalable · Diseño minimalista Braun
 </p>
 
 <p align="center">
@@ -16,36 +16,40 @@
 
 ---
 
-## ⚡ Demo en Tiempo Real
+## 🎬 Demostración en Tiempo Real
 
-<p align="center">
-  <img src="docs/demo.gif" width="380" alt="Demostración de Spens en vivo" style="border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" /><br />
-  <em>Escribí <code>hamburguesa 6.500</code> o <code>nafta 18k</code> y se interpreta e ingresa al instante.</em>
-</p>
+| **1. Ingreso de Gastos en Vivo** | **2. Menú de Rango Expandible** |
+| :---: | :---: |
+| <img src="docs/demo-typing.gif" width="280" style="border-radius: 16px;" /> | <img src="docs/demo-range-menu.gif" width="280" style="border-radius: 16px;" /> |
+| *Ingreso en lenguaje natural es-AR (`hamburguesa 6.500`)* | *Despliegue animado `anteayer` · `ayer` · `hoy`* |
 
----
-
-## 📱 Capturas de Pantalla
-
-| **Pantalla Principal** | **Filtro Expandido** | **Historial Mensual** | **Panel de Ajustes** |
-| :---: | :---: | :---: | :---: |
-| <img src="docs/screenshots/dashboard.png" width="220" /> | <img src="docs/screenshots/range-nav-expanded.png" width="220" /> | <img src="docs/screenshots/history.png" width="220" /> | <img src="docs/screenshots/settings.png" width="220" /> |
-| *Saldo y chat* | *`anteayer` · `ayer` · `hoy`* | *Desglose y navegación* | *Gestos y datos* |
+| **3. Resumen y Gráficos Mensuales** | **4. Modo Claro / Oscuro / Sistema** |
+| :---: | :---: |
+| <img src="docs/demo-history-summary.gif" width="280" style="border-radius: 16px;" /> | <img src="docs/demo-theme-switch.gif" width="280" style="border-radius: 16px;" /> |
+| *Desglose por categoría y consulta de meses* | *Cambio de apariencia en vivo* |
 
 ---
 
-## 🚀 Lo Destacado
+## 📸 Vistas Principales
 
-- 🗣️ **Parser Local es-AR**: Entiende `15 mil`, `2 lucas`, `5k`, `2 palos`, palabras escritas (`dos mil`), cobros (`cobré 180k`), y fechas relativas (`ayer`, `anteayer`, `12/3`).
-- 🗓️ **Filtros por Fecha**: Al presionar `hoy`, el menú se despliega animadamente mostrando `anteayer` y `ayer`. Al ingresar un gasto estando en `ayer`, se asigna directamente a ese día.
-- 🏷️ **Edición Rápida de Categorías**: Tocá cualquier ítem de la lista para reasignar su categoría al instante con un selector horizontal con *glassmorphism*.
-- 🤏 **Gestos Táctiles**: Deslizá hacia abajo para cerrar Ajustes con resistencia elástica (*rubber-band*), o arrastrá de izquierda a derecha para cerrar el Historial.
-- 🔒 **100% Privado y Offline**: Guardado en `localStorage`. No requiere cuenta ni servidor. Podés exportar e importar tus datos en `.json` en 1 clic.
-- 🎨 **Estética Dieter Rams**: Paleta cálida basada en OKLCH, tipografía limpia, sin sombras pesadas y color acento naranja Braun.
+| **Dashboard Principal** | **Categorías e Historial** |
+| :---: | :---: |
+| <img src="docs/screenshots/dashboard.png" width="300" /> | <img src="docs/screenshots/history.png" width="300" /> |
 
 ---
 
-## 🛠️ Desarrollo Local
+## ⚡ Características Clave
+
+- 🗣️ **Parser Conversacional Rioplatense**: Entiende `15 mil`, `2 lucas`, `5k`, `2 palos`, palabras escritas (`dos mil`), cobros (`cobré 180k`), y fechas relativas (`ayer`, `anteayer`, `12/3`).
+- 🗓️ **Filtros por Fecha**: Si tenés seleccionada la pestaña `ayer` o `anteayer`, los nuevos gastos ingresados se asignan automáticamente a ese día.
+- 🏷️ **Edición de Categorías**: Tocá cualquier item para cambiar su categoría en tiempo real con selector horizontal de chips con *glassmorphism*.
+- 🤏 **Gestos Táctiles Naturales**: Deslizá hacia abajo para cerrar Ajustes con resistencia elástica (*rubber-band*), o arrastrá de izquierda a derecha para cerrar el Historial.
+- 🔒 **100% Privado y Offline**: Guardado en `localStorage`. Exportación e importación completa en `.json` en 1 clic.
+- 🎨 **Estética Dieter Rams**: Paleta cálida basada en OKLCH, tipografía Helvetica limpia, sin sombras pesadas y color acento naranja Braun.
+
+---
+
+## 🚀 Desarrollo Local
 
 ```bash
 # Clonar e instalar
@@ -53,7 +57,7 @@ git clone https://github.com/Felivander/SPEN.git
 cd SPEN
 npm install
 
-# Correr servidor local (Vite)
+# Servidor de desarrollo
 npm run dev
 
 # Compilar para producción
@@ -64,12 +68,12 @@ npm run build
 
 ## 📲 Instalar en el Celular
 
-1. Entrá a **[https://felivander.github.io/SPEN/](https://felivander.github.io/SPEN/)** desde tu iPhone o Android.
+1. Entrá a **[https://felivander.github.io/SPEN/](https://felivander.github.io/SPEN/)** desde tu celular.
 2. En Safari/Chrome: **Compartir** ➔ **Agregar a pantalla de inicio**.
-3. ¡Listo! Se abre como una App nativa en pantalla completa y funciona sin conexión.
+3. Abrilo como una App nativa sin barras de navegador.
 
 ---
 
-## ⚙️ Tech Stack
+## ⚙️ Stack Tecnológico
 
 `React 18` · `TypeScript` · `Vite` · `Vanilla CSS (OKLCH)` · `vite-plugin-pwa` · `Iconoir` · `Playwright`
