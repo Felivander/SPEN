@@ -37,11 +37,12 @@ export function SettingsSheet({
 }: Props) {
   const sheetRef = useRef<HTMLDivElement>(null)
   const scrimRef  = useRef<HTMLDivElement>(null)
+  const gripRef   = useRef<HTMLDivElement>(null)
   const fileRef   = useRef<HTMLInputElement>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
   const [authError, setAuthError] = useState<string | null>(null)
 
-  useDragToClose(sheetRef, onClose, 'down', scrimRef)
+  useDragToClose(sheetRef, onClose, 'down', scrimRef, gripRef)
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -97,7 +98,7 @@ export function SettingsSheet({
         tabIndex={-1}
         ref={sheetRef}
       >
-        <div className="sheet__grip" aria-hidden="true" />
+        <div className="sheet__grip" aria-hidden="true" ref={gripRef} />
 
         <div className="sheet__head">
           <h2 className="sheet__title" id="sheet-title">

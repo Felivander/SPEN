@@ -690,9 +690,18 @@
   inline-size: 2.25rem;
   block-size: 0.25rem;
   margin-inline: auto;
-  margin-block-end: 0.75rem;
+  margin-block-end: 0.375rem;
   border-radius: 2px;
   background: var(--rule-strong);
+  /* Expand tap/drag area without changing visual size */
+  padding-block: 0.75rem;
+  background-clip: content-box;
+  cursor: grab;
+  touch-action: none;
+}
+
+.sheet__grip:active {
+  cursor: grabbing;
 }
 
 .sheet__head {
