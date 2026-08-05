@@ -1,7 +1,7 @@
 # Spens
 
 <p align="center">
-  <img src="docs/icon-512-preview.jpg" width="100" alt="Spens Logo" style="border-radius: 22px;" />
+  <img src="docs/banner.jpg" width="100%" alt="Spens Banner" style="border-radius: 16px;" />
 </p>
 
 <p align="center">
