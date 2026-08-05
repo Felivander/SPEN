@@ -8,8 +8,9 @@ import { useEffect, useRef } from 'react'
  * @param direction - 'down'  → bottom-sheet drag (SettingsSheet)
  *                    'right' → side-panel drag  (HistoryPage)
  * @param backdrop  - optional scrim/overlay element whose opacity tracks drag progress
- * @param handle    - optional element that must be the drag origin (e.g. the grip bar).
- *                    When provided, dragging anywhere else on the panel does nothing.
+ * @param handle    - optional element that is the ONLY valid drag origin (e.g. the grip bar).
+ *                    When provided, all pointer listeners are attached to the handle, so
+ *                    the rest of the panel remains fully scrollable.
  */
 export function useDragToClose(
   ref: React.RefObject<HTMLElement | null>,
@@ -22,20 +23,18 @@ export function useDragToClose(
   const draggingRef = useRef(false)
 
   useEffect(() => {
-    const el = ref.current
+    const el     = ref.current
     if (!el) return
 
-    const THRESHOLD = 80  // px — drag distance to trigger close
+    // Attach listeners to the handle when provided, otherwise fall back to the panel
+    const source: HTMLElement = handle?.current ?? el
+
+    const THRESHOLD = 80
     const EASING    = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
 
     // ─── Pointer Down ──────────────────────────────────────────────────────────
     const onPointerDown = (e: PointerEvent) => {
-      // Ignore non-primary mouse buttons
       if (e.button !== 0 && e.pointerType === 'mouse') return
-
-      // If a handle is defined, only allow drag when the touch starts on/in it
-      if (handle?.current && !handle.current.contains(e.target as Node)) return
-
       startRef.current    = { x: e.clientX, y: e.clientY }
       draggingRef.current = false
     }
@@ -51,17 +50,22 @@ export function useDragToClose(
       const secondary = direction === 'down' ? Math.abs(dx) : Math.abs(dy)
 
       if (!draggingRef.current) {
-        // Haven't committed yet — wait for a clear primary-axis movement
         if (Math.abs(primary) < 6 && secondary < 6) return
 
-        // Too much off-axis — cancel (let browser handle any scroll)
+        // Too much off-axis — cancel
         if (secondary > Math.abs(primary)) {
           startRef.current = null
           return
         }
 
-        // Moving the wrong way — cancel
+        // Wrong direction — cancel
         if (primary < 0) {
+          startRef.current = null
+          return
+        }
+
+        // Only drag from panel top when no handle is defined
+        if (!handle && direction === 'down' && el.scrollTop > 0) {
           startRef.current = null
           return
         }
@@ -70,7 +74,7 @@ export function useDragToClose(
         draggingRef.current = true
         el.style.overflowY  = 'hidden'
         el.style.overflowX  = 'hidden'
-        el.setPointerCapture(e.pointerId)
+        source.setPointerCapture(e.pointerId)
       }
 
       e.preventDefault()
@@ -89,7 +93,6 @@ export function useDragToClose(
 
       el.style.transition = 'none'
       el.style.transform  = translate
-      el.style.opacity    = ''
 
       const bd = backdrop?.current
       if (bd) {
@@ -121,7 +124,7 @@ export function useDragToClose(
       startRef.current    = null
       draggingRef.current = false
 
-      try { el.releasePointerCapture(e.pointerId) } catch { /* ignore */ }
+      try { source.releasePointerCapture(e.pointerId) } catch { /* ignore */ }
 
       const bd = backdrop?.current
 
@@ -147,16 +150,18 @@ export function useDragToClose(
       }
     }
 
-    el.addEventListener('pointerdown',   onPointerDown)
-    el.addEventListener('pointermove',   onPointerMove, { passive: false })
-    el.addEventListener('pointerup',     onPointerUp)
-    el.addEventListener('pointercancel', onPointerUp)
+    // All events go on `source` (the grip when provided, the panel otherwise).
+    // This means the sheet content is never touched and scrolls freely.
+    source.addEventListener('pointerdown',   onPointerDown)
+    source.addEventListener('pointermove',   onPointerMove, { passive: false })
+    source.addEventListener('pointerup',     onPointerUp)
+    source.addEventListener('pointercancel', onPointerUp)
 
     return () => {
-      el.removeEventListener('pointerdown',   onPointerDown)
-      el.removeEventListener('pointermove',   onPointerMove)
-      el.removeEventListener('pointerup',     onPointerUp)
-      el.removeEventListener('pointercancel', onPointerUp)
+      source.removeEventListener('pointerdown',   onPointerDown)
+      source.removeEventListener('pointermove',   onPointerMove)
+      source.removeEventListener('pointerup',     onPointerUp)
+      source.removeEventListener('pointercancel', onPointerUp)
     }
   }, [ref, onClose, direction, backdrop, handle])
 }
