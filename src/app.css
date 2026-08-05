@@ -855,6 +855,14 @@
   border-color: var(--ink-muted);
 }
 
+.btn--full {
+  inline-size: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: 0.75rem;
+}
+
 .input:focus,
 .select:focus {
   border-color: var(--accent);

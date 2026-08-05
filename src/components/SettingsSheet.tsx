@@ -78,11 +78,11 @@ export function SettingsSheet({
   const clearAll = () => {
     if (movements.length === 0) return
     const ok = window.confirm(
-      `Se borran ${movements.length} movimientos de este dispositivo. Esta acción no se puede deshacer. ¿Seguir?`,
+      `Se eliminarán ${movements.length} movimiento${movements.length === 1 ? '' : 's'}. Esta acción no se puede deshacer y borrará tus datos de este dispositivo${user ? ' y de Supabase' : ''}. ¿Deseás continuar?`,
     )
     if (ok) {
       onClear()
-      setFeedback('Movimientos borrados.')
+      setFeedback('Todos los movimientos fueron borrados correctamente.')
     }
   }
 
@@ -299,33 +299,44 @@ export function SettingsSheet({
           />
         </label>
 
-        {/* ----- Datos ----------------------------------------------------- */}
+        {/* ----- Datos y Respaldo ------------------------------------------- */}
 
-        <div className="sheet__actions">
-          <button type="button" className="btn btn--grow" onClick={download}>
-            Exportar
-          </button>
+        <div className="field">
+          <span className="field__label">Datos y Respaldo</span>
+          <div className="sheet__actions">
+            <button type="button" className="btn btn--grow" onClick={download}>
+              Exportar (.json)
+            </button>
+            <button
+              type="button"
+              className="btn btn--grow"
+              onClick={() => fileRef.current?.click()}
+            >
+              Importar
+            </button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="application/json,.json"
+              className="sr-only"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) void pickFile(file)
+                e.target.value = ''
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="field">
           <button
             type="button"
-            className="btn btn--grow"
-            onClick={() => fileRef.current?.click()}
+            className="btn btn--danger btn--full"
+            onClick={clearAll}
+            disabled={movements.length === 0}
           >
-            Importar
+            Borrar todos los movimientos ({movements.length})
           </button>
-          <button type="button" className="btn btn--danger btn--grow" onClick={clearAll}>
-            Borrar todo
-          </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="application/json,.json"
-            className="sr-only"
-            onChange={(e) => {
-              const file = e.target.files?.[0]
-              if (file) void pickFile(file)
-              e.target.value = ''
-            }}
-          />
         </div>
 
         {feedback && (
