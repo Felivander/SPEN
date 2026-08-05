@@ -171,6 +171,16 @@
   font-weight: 700;
 }
 
+.tab--custom-month {
+  color: var(--accent-text);
+  font-weight: 700;
+}
+
+.tab--selected-month {
+  color: var(--accent-text);
+  font-weight: 700;
+}
+
 .nav__steps {
   display: flex;
   align-items: center;

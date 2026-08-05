@@ -287,8 +287,10 @@ export default function App() {
       <RangeNav
         scope={scope}
         tab={tab}
+        anchor={anchor}
         onScopeChange={handleScopeChange}
         onTabChange={setTab}
+        onAnchorChange={setAnchor}
         selectedNet={visibleNet}
         currency={currencySymbol}
         locale={settings.locale}
