@@ -690,38 +690,25 @@
   inline-size: 2.25rem;
   block-size: 0.25rem;
   margin-inline: auto;
-  margin-block-end: 0.375rem;
+  margin-block: 0.5rem 0.625rem;
   border-radius: 2px;
   background: var(--rule-strong);
-  /* Expand tap/drag area without changing visual size */
-  padding-block: 0.75rem;
-  background-clip: content-box;
-  cursor: grab;
-  touch-action: none;
-}
-
-.sheet__grip:active {
-  cursor: grabbing;
 }
 
 .sheet__sticky-top {
   position: sticky;
   top: 0;
   z-index: 10;
-  /* Pull back to cover top & side padding of the sheet */
   margin-inline: -1rem;
   margin-block-start: -0.75rem;
   padding-inline: 1rem;
-  padding-block-start: 0.75rem;
   padding-block-end: 0.75rem;
-  /* Frosted glass background */
-  background: color-mix(in oklch, var(--paper) 75%, transparent);
-  backdrop-filter: blur(20px) saturate(1.5);
-  -webkit-backdrop-filter: blur(20px) saturate(1.5);
-  /* Gentle gradient mask fade at bottom edge */
-  -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
-  mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+  background: var(--paper);
+  border-block-end: 1px solid var(--rule-strong);
+  border-start-start-radius: 28px;
+  border-start-end-radius: 28px;
   cursor: grab;
+  touch-action: none;
 }
 
 .sheet__sticky-top:active {
