@@ -12,62 +12,64 @@ if (!fs.existsSync(outputDir)) {
 const today = new Date().toISOString().slice(0, 10)
 const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
 const anteayer = new Date(Date.now() - 86400000 * 2).toISOString().slice(0, 10)
-const day4 = new Date(Date.now() - 86400000 * 4).toISOString().slice(0, 10)
-const day7 = new Date(Date.now() - 86400000 * 7).toISOString().slice(0, 10)
-const day12 = new Date(Date.now() - 86400000 * 12).toISOString().slice(0, 10)
+const day5 = new Date(Date.now() - 86400000 * 5).toISOString().slice(0, 10)
+const day10 = new Date(Date.now() - 86400000 * 10).toISOString().slice(0, 10)
 const lastMonth = new Date(Date.now() - 86400000 * 32).toISOString().slice(0, 10)
 
+// Initial state: Net balance for Today = +523.000 - 80.000 - 50.000 - 30.000 - 18.000 = $345.000
 const mockMovements = [
   {
     id: 'm1',
     kind: 'ingreso',
-    amount: 850000,
-    description: 'Sueldo mensual',
+    amount: 523000,
+    description: 'Cobro proyecto UI',
     category: 'Trabajo',
     date: today,
-    createdAt: Date.now() - 3600000 * 1,
+    createdAt: Date.now() - 3600000 * 5,
   },
   {
     id: 'm2',
     kind: 'gasto',
-    amount: 48600,
-    description: 'Supermercado Coto compra del mes',
+    amount: 80000,
+    description: 'Supermercado Coto 80k',
     category: 'Super',
     date: today,
-    createdAt: Date.now() - 3600000 * 2,
+    createdAt: Date.now() - 3600000 * 4,
   },
   {
     id: 'm3',
     kind: 'gasto',
-    amount: 22000,
-    description: 'Nafta YPF Súper',
-    category: 'Transporte',
+    amount: 50000,
+    description: 'Cortinas roller 50k',
+    category: 'Hogar',
     date: today,
     createdAt: Date.now() - 3600000 * 3,
   },
   {
     id: 'm4',
     kind: 'gasto',
-    amount: 11200,
-    description: 'Farmacity remedios y botiquín',
-    category: 'Salud',
+    amount: 30000,
+    description: 'Cerveza artesanal 30k',
+    category: 'Comida',
     date: today,
-    createdAt: Date.now() - 3600000 * 4,
+    createdAt: Date.now() - 3600000 * 2,
   },
   {
     id: 'm5',
     kind: 'gasto',
-    amount: 6500,
-    description: 'Hamburguesa Mostaza',
-    category: 'Comida',
+    amount: 18000,
+    description: 'Nafta YPF Súper 18k',
+    category: 'Transporte',
     date: today,
-    createdAt: Date.now() - 3600000 * 5,
+    createdAt: Date.now() - 3600000 * 1,
   },
+
+  // Yesterday
   {
     id: 'm6',
     kind: 'ingreso',
-    amount: 240000,
-    description: 'Freelance diseño UI web',
+    amount: 250000,
+    description: 'Sueldo avance',
     category: 'Trabajo',
     date: yesterday,
     createdAt: Date.now() - 86400000 - 3600000 * 1,
@@ -75,21 +77,23 @@ const mockMovements = [
   {
     id: 'm7',
     kind: 'gasto',
-    amount: 14200,
-    description: 'Cena sushi PedidosYa',
-    category: 'Comida',
+    amount: 24000,
+    description: 'Gimnasio cuota mensual',
+    category: 'Salud',
     date: yesterday,
     createdAt: Date.now() - 86400000 - 3600000 * 3,
   },
   {
     id: 'm8',
     kind: 'gasto',
-    amount: 4800,
-    description: 'Cabify viaje a Palermo',
-    category: 'Transporte',
+    amount: 12500,
+    description: 'Farmacity medicamentos',
+    category: 'Salud',
     date: yesterday,
     createdAt: Date.now() - 86400000 - 3600000 * 5,
   },
+
+  // Anteayer
   {
     id: 'm9',
     kind: 'gasto',
@@ -102,92 +106,58 @@ const mockMovements = [
   {
     id: 'm10',
     kind: 'gasto',
-    amount: 24000,
-    description: 'Cuota Gimnasio Megatlon',
-    category: 'Salud',
+    amount: 18200,
+    description: 'Internet Personal 300Mb',
+    category: 'Servicios',
     date: anteayer,
     createdAt: Date.now() - 86400000 * 2 - 3600000 * 4,
   },
   {
     id: 'm11',
     kind: 'gasto',
-    amount: 3800,
-    description: 'Café especialidad con tostadas',
-    category: 'Comida',
+    amount: 4800,
+    description: 'Cabify viaje centro',
+    category: 'Transporte',
     date: anteayer,
     createdAt: Date.now() - 86400000 * 2 - 3600000 * 6,
   },
+
+  // Earlier month
   {
     id: 'm12',
     kind: 'gasto',
-    amount: 27300,
+    amount: 35000,
     description: 'Carrefour compras',
     category: 'Super',
-    date: day4,
-    createdAt: Date.now() - 86400000 * 4 - 3600000 * 2,
+    date: day5,
+    createdAt: Date.now() - 86400000 * 5 - 3600000 * 2,
   },
   {
     id: 'm13',
     kind: 'gasto',
-    amount: 18200,
-    description: 'Internet Personal 300Mb',
-    category: 'Servicios',
-    date: day4,
-    createdAt: Date.now() - 86400000 * 4 - 3600000 * 5,
-  },
-  {
-    id: 'm14',
-    kind: 'ingreso',
-    amount: 65000,
-    description: 'Venta bicicleta usada',
-    category: 'Ventas',
-    date: day7,
-    createdAt: Date.now() - 86400000 * 7 - 3600000 * 1,
-  },
-  {
-    id: 'm15',
-    kind: 'gasto',
-    amount: 12000,
-    description: 'Pizzería Güerrin',
-    category: 'Comida',
-    date: day7,
-    createdAt: Date.now() - 86400000 * 7 - 3600000 * 4,
-  },
-  {
-    id: 'm16',
-    kind: 'gasto',
     amount: 6900,
     description: 'Netflix plan estándar',
     category: 'Entretenimiento',
-    date: day12,
-    createdAt: Date.now() - 86400000 * 12 - 3600000 * 2,
+    date: day10,
+    createdAt: Date.now() - 86400000 * 10 - 3600000 * 2,
   },
   {
-    id: 'm17',
+    id: 'm14',
     kind: 'gasto',
     amount: 3500,
     description: 'Spotify Premium',
     category: 'Entretenimiento',
-    date: day12,
-    createdAt: Date.now() - 86400000 * 12 - 3600000 * 4,
+    date: day10,
+    createdAt: Date.now() - 86400000 * 10 - 3600000 * 4,
   },
   {
-    id: 'm18',
+    id: 'm15',
     kind: 'ingreso',
-    amount: 820000,
+    amount: 780000,
     description: 'Sueldo mes anterior',
     category: 'Trabajo',
     date: lastMonth,
     createdAt: Date.now() - 86400000 * 32 - 3600000 * 1,
-  },
-  {
-    id: 'm19',
-    kind: 'gasto',
-    amount: 52000,
-    description: 'Super Coto mes anterior',
-    category: 'Super',
-    date: lastMonth,
-    createdAt: Date.now() - 86400000 * 32 - 3600000 * 3,
   },
 ]
 
@@ -212,8 +182,8 @@ async function saveGIF(frames, outputPath, width, height, delay = 100) {
 async function run() {
   const browser = await chromium.launch({ headless: true })
 
-  // 1. Capture High-Res iPhone Screenshots
-  console.log('Capturing high-res iPhone screenshots...')
+  // 1. Capture High-Res iPhone Screenshots (with correct localStorage key)
+  console.log('Capturing high-res iPhone screenshots with populated data...')
   const hiResContext = await browser.newContext({
     viewport: { width: 393, height: 852 },
     deviceScaleFactor: 2,
@@ -224,16 +194,18 @@ async function run() {
   await hiResPage.goto('http://localhost:5173/SPEN/')
   await hiResPage.waitForLoadState('networkidle')
 
+  // Set the exact localStorage key used by the app!
   await hiResPage.evaluate((data) => {
-    localStorage.setItem('spens_movements', JSON.stringify(data))
+    localStorage.setItem('xpenz.movements.v1', JSON.stringify(data))
   }, mockMovements)
 
   await hiResPage.reload()
   await hiResPage.waitForLoadState('networkidle')
+  await hiResPage.waitForTimeout(300)
 
   // Dashboard screenshot
   await hiResPage.screenshot({ path: path.join(outputDir, 'dashboard.png') })
-  console.log('Saved dashboard.png')
+  console.log('Saved dashboard.png (populated with $345.000 balance and items!)')
 
   // Category Edit screenshot
   const firstRow = hiResPage.locator('.row').first()
@@ -279,6 +251,7 @@ async function run() {
   }
   await hiResContext.close()
 
+  // Helper function to create page with populated data
   const createRecordPage = async () => {
     const ctx = await browser.newContext({
       viewport: { width: 393, height: 852 },
@@ -290,7 +263,7 @@ async function run() {
     await p.goto('http://localhost:5173/SPEN/')
     await p.waitForLoadState('networkidle')
     await p.evaluate((data) => {
-      localStorage.setItem('spens_movements', JSON.stringify(data))
+      localStorage.setItem('xpenz.movements.v1', JSON.stringify(data))
     }, mockMovements)
     await p.reload()
     await p.waitForLoadState('networkidle')
@@ -298,13 +271,19 @@ async function run() {
   }
 
   // --------------------------------------------------------------------------
-  // GIF 1: Real-time Typing (demo.gif & demo-typing.gif)
+  // GIF 1: Real-time Typing with existing items (demo.gif & demo-typing.gif)
   // --------------------------------------------------------------------------
-  console.log('Recording GIF 1: Real-time typing...')
+  console.log('Recording GIF 1: Real-time typing with pre-populated expenses ($345k)...')
   {
     const { ctx, p } = await createRecordPage()
     const frames = []
     const input = p.locator('textarea.chat__input, input.chat__input').first()
+
+    // Show initial state with list populated ($345.000)
+    for (let i = 0; i < 6; i++) {
+      await p.waitForTimeout(100)
+      frames.push(await p.screenshot({ type: 'png' }))
+    }
 
     await input.click()
     frames.push(await p.screenshot({ type: 'png' }))
@@ -322,7 +301,7 @@ async function run() {
 
     await input.press('Enter')
 
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < 18; i++) {
       await p.waitForTimeout(100)
       frames.push(await p.screenshot({ type: 'png' }))
     }
@@ -335,7 +314,7 @@ async function run() {
   // --------------------------------------------------------------------------
   // GIF 2: Range Nav Expansion (demo-range-menu.gif)
   // --------------------------------------------------------------------------
-  console.log('Recording GIF 2: Expanding range nav...')
+  console.log('Recording GIF 2: Expanding range nav with populated days...')
   {
     const { ctx, p } = await createRecordPage()
     const frames = []
@@ -345,7 +324,6 @@ async function run() {
       frames.push(await p.screenshot({ type: 'png' }))
     }
 
-    // Tap hoy -> expands anteayer - ayer - hoy
     const hoyBtn = p.locator('button:text-is("hoy")').first()
     await hoyBtn.click()
 
@@ -354,23 +332,20 @@ async function run() {
       frames.push(await p.screenshot({ type: 'png' }))
     }
 
-    // Tap ayer tab using exact text selector
     const ayerBtn = p.locator('button:text-is("ayer")').first()
     await ayerBtn.click({ force: true })
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 12; i++) {
       await p.waitForTimeout(80)
       frames.push(await p.screenshot({ type: 'png' }))
     }
 
-    // Tap anteayer tab using exact text selector
     const anteayerBtn = p.locator('button:text-is("anteayer")').first()
     await anteayerBtn.click({ force: true })
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 12; i++) {
       await p.waitForTimeout(80)
       frames.push(await p.screenshot({ type: 'png' }))
     }
 
-    // Tap hoy again -> collapses
     await hoyBtn.click({ force: true })
     for (let i = 0; i < 8; i++) {
       await p.waitForTimeout(50)
@@ -430,7 +405,7 @@ async function run() {
   // --------------------------------------------------------------------------
   // GIF 4: History & Monthly Summary (demo-history-summary.gif)
   // --------------------------------------------------------------------------
-  console.log('Recording GIF 4: History & Monthly summary...')
+  console.log('Recording GIF 4: History & Monthly summary with full data...')
   {
     const { ctx, p } = await createRecordPage()
     const frames = []
@@ -445,7 +420,7 @@ async function run() {
     const resumenTab = p.locator('.hist-page__nav button:text-is("resumen")').first()
     if (await resumenTab.isVisible()) {
       await resumenTab.click()
-      for (let i = 0; i < 12; i++) {
+      for (let i = 0; i < 14; i++) {
         await p.waitForTimeout(80)
         frames.push(await p.screenshot({ type: 'png' }))
       }
@@ -454,7 +429,7 @@ async function run() {
     const prevMonthBtn = p.locator('button[aria-label="Mes anterior"]').first()
     if (await prevMonthBtn.isVisible()) {
       await prevMonthBtn.click()
-      for (let i = 0; i < 12; i++) {
+      for (let i = 0; i < 14; i++) {
         await p.waitForTimeout(80)
         frames.push(await p.screenshot({ type: 'png' }))
       }
@@ -465,7 +440,7 @@ async function run() {
   }
 
   await browser.close()
-  console.log('🎉 All GIFs and screenshots successfully generated!')
+  console.log('🎉 All GIFs and screenshots successfully generated with exact $345.000 balance!')
 }
 
 run().catch((err) => {
