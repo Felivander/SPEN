@@ -29,8 +29,16 @@ export function RangeNav({
   locale,
 }: Props) {
   const [open, setOpen] = useState(false)
+  const [expanded, setExpanded] = useState(false)
   const anchorRef = useRef<HTMLDivElement>(null)
   const chipRef = useRef<HTMLButtonElement>(null)
+
+  // Collapse extra tabs when switching away from the recent-day tabs
+  useEffect(() => {
+    if (tab !== 'hoy' && tab !== 'ayer' && tab !== 'anteayer') {
+      setExpanded(false)
+    }
+  }, [tab])
 
   useEffect(() => {
     if (!open) return
@@ -64,6 +72,19 @@ export function RangeNav({
     onScopeChange(next)
     setOpen(false)
     chipRef.current?.focus()
+  }
+
+  const handleHoyClick = () => {
+    if (tab !== 'hoy') {
+      // Not on hoy: just select it
+      onTabChange('hoy')
+    } else if (!expanded) {
+      // On hoy, not expanded: expand to show anteayer + ayer
+      setExpanded(true)
+    } else {
+      // On hoy, expanded: collapse
+      setExpanded(false)
+    }
   }
 
   return (
@@ -103,15 +124,40 @@ export function RangeNav({
         </div>
 
         {scope === 'mes' ? (
-          <button
-            type="button"
-            role="tab"
-            className="tab"
-            aria-selected={tab === 'hoy'}
-            onClick={() => onTabChange(tab === 'hoy' ? 'periodo' : 'hoy')}
-          >
-            hoy
-          </button>
+          <>
+            {/* Expanding tabs: anteayer + ayer */}
+            <div className={`nav__extra${expanded ? ' nav__extra--open' : ''}`} aria-hidden={!expanded}>
+              <button
+                type="button"
+                role="tab"
+                className="tab"
+                tabIndex={expanded ? 0 : -1}
+                aria-selected={tab === 'anteayer'}
+                onClick={() => onTabChange('anteayer')}
+              >
+                anteayer
+              </button>
+              <button
+                type="button"
+                role="tab"
+                className="tab"
+                tabIndex={expanded ? 0 : -1}
+                aria-selected={tab === 'ayer'}
+                onClick={() => onTabChange('ayer')}
+              >
+                ayer
+              </button>
+            </div>
+            <button
+              type="button"
+              role="tab"
+              className="tab"
+              aria-selected={tab === 'hoy'}
+              onClick={handleHoyClick}
+            >
+              hoy
+            </button>
+          </>
         ) : (
           WEEKDAYS.map((day, index) => (
             <button

@@ -17,6 +17,7 @@ import {
   monthLabel,
   startOfWeek,
   todayISO,
+  toISODate,
   weekdayIndex,
 } from './lib/dates'
 import { formatMoney } from './lib/format'
@@ -82,9 +83,17 @@ export default function App() {
 
     if (tab === 'periodo') return inScope
     if (tab === 'hoy') return inScope.filter((m) => m.date === today)
+    if (tab === 'ayer') {
+      const ayer = toISODate(addDays(new Date(), -1))
+      return movements.filter((m) => m.date === ayer)
+    }
+    if (tab === 'anteayer') {
+      const anteayer = toISODate(addDays(new Date(), -2))
+      return movements.filter((m) => m.date === anteayer)
+    }
 
     // Weekday tab: the matching day inside the anchored week.
-    const target = addDays(startOfWeek(anchor), tab)
+    const target = addDays(startOfWeek(anchor), tab as number)
     return inScope.filter(
       (m) => fromISODate(m.date).getTime() === target.getTime(),
     )
@@ -219,7 +228,7 @@ export default function App() {
         locale={settings.locale}
       />
 
-      {tab !== 'hoy' && (
+      {tab !== 'hoy' && tab !== 'ayer' && tab !== 'anteayer' && (
         <div className="summary">
           <span className="summary__period">{monthLabel(anchor)}</span>
         </div>

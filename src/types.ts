@@ -20,7 +20,7 @@ export type Scope = 'mes' | 'semana'
  * `'hoy'`     = today (only offered in month scope).
  * `0..6`      = a weekday, Monday-first (only offered in week scope).
  */
-export type Tab = 'periodo' | 'hoy' | number
+export type Tab = 'periodo' | 'hoy' | 'ayer' | 'anteayer' | number
 
 export type Theme = 'system' | 'light' | 'dark'
 
