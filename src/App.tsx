@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import './app.css'
 
 import { BalanceCard } from './components/BalanceCard'
@@ -250,6 +250,13 @@ export default function App() {
   // Respects the "show symbol" toggle — pass '' to hide it everywhere
   const currencySymbol = settings.showCurrency ? settings.currency : ''
 
+  const listRef = useRef<HTMLElement>(null)
+
+  // Reset list scroll position to top when changing month/tab/scope
+  useEffect(() => {
+    if (listRef.current) listRef.current.scrollTop = 0
+  }, [anchor, tab, scope])
+
   /* --------------------------------------------------------------- view -- */
 
   return (
@@ -302,7 +309,7 @@ export default function App() {
         </div>
       )}
 
-      <main className="list">
+      <main className="list" ref={listRef}>
         <MovementList
           movements={visible}
           groupByDay={groupByDay}
