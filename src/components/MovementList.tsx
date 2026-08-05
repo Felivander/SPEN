@@ -20,6 +20,16 @@ function dayHeading(iso: string): string {
   return `${WEEKDAYS[weekdayIndex(d)]} ${d.getDate()} ${MONTHS[d.getMonth()].slice(0, 3)}`
 }
 
+const EVER_HAD_KEY = 'xpenz.everHadMovements'
+
+function markEverHad() {
+  try { window.localStorage.setItem(EVER_HAD_KEY, '1') } catch { /* ignore */ }
+}
+
+function everHad(): boolean {
+  try { return !!window.localStorage.getItem(EVER_HAD_KEY) } catch { return false }
+}
+
 export function MovementList({
   movements,
   groupByDay,
@@ -30,7 +40,12 @@ export function MovementList({
 }: Props) {
   const [openId, setOpenId] = useState<string | null>(null)
 
+  // Persist the flag as soon as there's at least one movement
+  if (movements.length > 0) markEverHad()
+
   if (movements.length === 0) {
+    // Show the welcome hint only the very first time (never used before)
+    if (everHad()) return null
     return (
       <div className="empty">
         <p className="empty__title">Nada por acá todavía.</p>
