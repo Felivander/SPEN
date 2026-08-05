@@ -38,6 +38,8 @@ export interface Settings {
   proxyUrl: string
   currency: string
   locale: string
+  supabaseUrl?: string
+  supabaseAnonKey?: string
 }
 
 export interface ParsedResult {

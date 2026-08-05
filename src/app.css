@@ -825,6 +825,15 @@
   line-height: 1.4;
 }
 
+.auth-card__error {
+  font-size: var(--text-label);
+  color: var(--accent-text);
+  line-height: 1.4;
+  padding: 0.375rem 0.625rem;
+  border-radius: var(--r-inner);
+  background: var(--accent-wash);
+}
+
 .btn--google {
   display: inline-flex;
   align-items: center;

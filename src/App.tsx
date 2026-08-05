@@ -66,20 +66,20 @@ export default function App() {
       if (currentUser) {
         // Sync local movements to cloud and download remote movements
         void (async () => {
-          const remote = await fetchRemoteMovements(currentUser.id)
+          const remote = await fetchRemoteMovements(currentUser.id, settings)
           setMovements((local) => {
             const map = new Map<string, Movement>()
             // Put remote first, then override with local to preserve recent edits
             for (const m of remote) map.set(m.id, m)
             for (const m of local) map.set(m.id, m)
             const merged = Array.from(map.values())
-            void syncMovementsToCloud(currentUser.id, merged)
+            void syncMovementsToCloud(currentUser.id, merged, settings)
             return merged
           })
         })()
       }
-    })
-  }, [])
+    }, settings)
+  }, [settings])
 
   useEffect(() => saveMovements(movements), [movements])
   useEffect(() => saveSettings(settings), [settings])
@@ -320,8 +320,8 @@ export default function App() {
           settings={settings}
           movements={movements}
           user={user}
-          onSignInWithGoogle={() => void signInWithGoogle()}
-          onSignOut={() => void signOut()}
+          onSignInWithGoogle={() => signInWithGoogle(settings)}
+          onSignOut={() => signOut(settings)}
           onChange={(patch) => setSettings((prev) => ({ ...prev, ...patch }))}
           onImport={handleImportMovements}
           onClear={handleClearMovements}

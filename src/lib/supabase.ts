@@ -1,33 +1,47 @@
 import { createClient, type Session, type User } from '@supabase/supabase-js'
-import type { Movement } from '../types'
+import type { Movement, Settings } from '../types'
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || ''
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+let cachedClient: ReturnType<typeof createClient> | null = null
+let cachedUrl = ''
+let cachedKey = ''
 
-export const supabase =
-  SUPABASE_URL && SUPABASE_ANON_KEY
-    ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-        },
-      })
-    : null
+export function getSupabaseClient(settings?: Settings) {
+  const url = settings?.supabaseUrl || import.meta.env.VITE_SUPABASE_URL || ''
+  const key = settings?.supabaseAnonKey || import.meta.env.VITE_SUPABASE_ANON_KEY || ''
 
-export function isSupabaseConfigured(): boolean {
-  return Boolean(supabase)
+  if (!url || !key) return null
+
+  if (cachedClient && cachedUrl === url && cachedKey === key) {
+    return cachedClient
+  }
+
+  cachedUrl = url
+  cachedKey = key
+  cachedClient = createClient(url, key, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+    },
+  })
+
+  return cachedClient
+}
+
+export function isSupabaseConfigured(settings?: Settings): boolean {
+  return Boolean(getSupabaseClient(settings))
 }
 
 /**
  * Initiates Google OAuth login via Supabase.
  * Redirects back to the current origin URL.
  */
-export async function signInWithGoogle(): Promise<void> {
-  if (!supabase) {
-    throw new Error('Supabase no está configurado. Agregá VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY.')
+export async function signInWithGoogle(settings?: Settings): Promise<void> {
+  const client = getSupabaseClient(settings)
+  if (!client) {
+    throw new Error('Supabase no está configurado. Ingresá tu URL y Anon Key de Supabase en Ajustes.')
   }
 
-  const { error } = await supabase.auth.signInWithOAuth({
+  const { error } = await client.auth.signInWithOAuth({
     provider: 'google',
     options: {
       redirectTo: window.location.origin + window.location.pathname,
@@ -40,9 +54,10 @@ export async function signInWithGoogle(): Promise<void> {
 /**
  * Signs out the current user session.
  */
-export async function signOut(): Promise<void> {
-  if (!supabase) return
-  const { error } = await supabase.auth.signOut()
+export async function signOut(settings?: Settings): Promise<void> {
+  const client = getSupabaseClient(settings)
+  if (!client) return
+  const { error } = await client.auth.signOut()
   if (error) throw error
 }
 
@@ -51,17 +66,19 @@ export async function signOut(): Promise<void> {
  */
 export function onAuthStateChange(
   callback: (session: Session | null, user: User | null) => void,
+  settings?: Settings,
 ) {
-  if (!supabase) return () => {}
+  const client = getSupabaseClient(settings)
+  if (!client) return () => {}
 
   // Trigger initial check
-  supabase.auth.getSession().then(({ data }) => {
+  client.auth.getSession().then(({ data }) => {
     callback(data.session, data.session?.user ?? null)
   })
 
   const {
     data: { subscription },
-  } = supabase.auth.onAuthStateChange((_event, session) => {
+  } = client.auth.onAuthStateChange((_event, session) => {
     callback(session, session?.user ?? null)
   })
 
@@ -84,10 +101,11 @@ interface SupabaseMovementRow {
 /**
  * Downloads all movements stored in Supabase for the authenticated user.
  */
-export async function fetchRemoteMovements(userId: string): Promise<Movement[]> {
-  if (!supabase) return []
+export async function fetchRemoteMovements(userId: string, settings?: Settings): Promise<Movement[]> {
+  const client = getSupabaseClient(settings)
+  if (!client) return []
 
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from('movements')
     .select('*')
     .eq('user_id', userId)
@@ -114,8 +132,10 @@ export async function fetchRemoteMovements(userId: string): Promise<Movement[]> 
 export async function syncMovementsToCloud(
   userId: string,
   movements: Movement[],
+  settings?: Settings,
 ): Promise<boolean> {
-  if (!supabase || movements.length === 0) return true
+  const client = getSupabaseClient(settings)
+  if (!client || movements.length === 0) return true
 
   const rows: SupabaseMovementRow[] = movements.map((m) => ({
     id: m.id,
@@ -128,7 +148,7 @@ export async function syncMovementsToCloud(
     created_at: m.createdAt,
   }))
 
-  const { error } = await supabase.from('movements').upsert(rows, {
+  const { error } = await client.from('movements').upsert(rows as any, {
     onConflict: 'id',
   })
 
@@ -146,10 +166,12 @@ export async function syncMovementsToCloud(
 export async function deleteRemoteMovement(
   userId: string,
   movementId: string,
+  settings?: Settings,
 ): Promise<boolean> {
-  if (!supabase) return true
+  const client = getSupabaseClient(settings)
+  if (!client) return true
 
-  const { error } = await supabase
+  const { error } = await client
     .from('movements')
     .delete()
     .eq('id', movementId)
@@ -166,10 +188,11 @@ export async function deleteRemoteMovement(
 /**
  * Clears all remote movements for the user (e.g. on Clear All).
  */
-export async function clearRemoteMovements(userId: string): Promise<boolean> {
-  if (!supabase) return true
+export async function clearRemoteMovements(userId: string, settings?: Settings): Promise<boolean> {
+  const client = getSupabaseClient(settings)
+  if (!client) return true
 
-  const { error } = await supabase
+  const { error } = await client
     .from('movements')
     .delete()
     .eq('user_id', userId)

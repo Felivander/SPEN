@@ -11,6 +11,8 @@ export const DEFAULT_SETTINGS: Settings = {
   proxyUrl: import.meta.env.VITE_LLM_PROXY_URL ?? '',
   currency: '$',
   locale: 'es-AR',
+  supabaseUrl: import.meta.env.VITE_SUPABASE_URL ?? '',
+  supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY ?? '',
 }
 
 /** localStorage is unavailable in private-mode Safari and inside some iframes. */

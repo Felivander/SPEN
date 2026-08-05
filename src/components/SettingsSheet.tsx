@@ -39,6 +39,7 @@ export function SettingsSheet({
   const scrimRef  = useRef<HTMLDivElement>(null)
   const fileRef   = useRef<HTMLInputElement>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
+  const [authError, setAuthError] = useState<string | null>(null)
 
   useDragToClose(sheetRef, onClose, 'down', scrimRef)
 
@@ -158,16 +159,59 @@ export function SettingsSheet({
               <p className="auth-card__hint">
                 Iniciá sesión para respaldar tus gastos en la nube y acceder desde cualquier celular o PC.
               </p>
+              {authError && (
+                <p className="auth-card__error">{authError}</p>
+              )}
               <button
                 type="button"
                 className="btn btn--google"
-                onClick={onSignInWithGoogle}
+                onClick={async () => {
+                  setAuthError(null)
+                  try {
+                    await onSignInWithGoogle()
+                  } catch (err) {
+                    setAuthError(err instanceof Error ? err.message : 'Error al iniciar sesión con Google')
+                  }
+                }}
               >
                 <GoogleIcon size={18} />
                 <span>Continuar con Google</span>
               </button>
             </div>
           )}
+        </div>
+
+        {/* ----- Configuración de Supabase --------------------------------- */}
+        <div className="field">
+          <label className="field__label" htmlFor="supabase-url">
+            Supabase URL (opcional si usás .env)
+          </label>
+          <input
+            id="supabase-url"
+            type="url"
+            className="input"
+            placeholder="https://tu-proyecto.supabase.co"
+            value={settings.supabaseUrl ?? ''}
+            onChange={(e) => onChange({ supabaseUrl: e.target.value })}
+            autoCapitalize="none"
+            autoCorrect="off"
+          />
+        </div>
+
+        <div className="field">
+          <label className="field__label" htmlFor="supabase-key">
+            Supabase Anon Key (opcional si usás .env)
+          </label>
+          <input
+            id="supabase-key"
+            type="password"
+            className="input"
+            placeholder="eyJhbGciOi..."
+            value={settings.supabaseAnonKey ?? ''}
+            onChange={(e) => onChange({ supabaseAnonKey: e.target.value })}
+            autoCapitalize="none"
+            autoCorrect="off"
+          />
         </div>
 
         {/* ----- Apariencia ------------------------------------------------ */}
