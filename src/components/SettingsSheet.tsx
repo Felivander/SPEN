@@ -181,39 +181,6 @@ export function SettingsSheet({
           )}
         </div>
 
-        {/* ----- Configuración de Supabase --------------------------------- */}
-        <div className="field">
-          <label className="field__label" htmlFor="supabase-url">
-            Supabase URL (opcional si usás .env)
-          </label>
-          <input
-            id="supabase-url"
-            type="url"
-            className="input"
-            placeholder="https://tu-proyecto.supabase.co"
-            value={settings.supabaseUrl ?? ''}
-            onChange={(e) => onChange({ supabaseUrl: e.target.value })}
-            autoCapitalize="none"
-            autoCorrect="off"
-          />
-        </div>
-
-        <div className="field">
-          <label className="field__label" htmlFor="supabase-key">
-            Supabase Anon Key (opcional si usás .env)
-          </label>
-          <input
-            id="supabase-key"
-            type="password"
-            className="input"
-            placeholder="eyJhbGciOi..."
-            value={settings.supabaseAnonKey ?? ''}
-            onChange={(e) => onChange({ supabaseAnonKey: e.target.value })}
-            autoCapitalize="none"
-            autoCorrect="off"
-          />
-        </div>
-
         {/* ----- Apariencia ------------------------------------------------ */}
 
         <div className="field">
