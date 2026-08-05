@@ -11,7 +11,7 @@ export default defineConfig({
    * Deploying to a root domain instead (Vercel, Netlify, a custom domain)?
    * Build with BASE_PATH=/ and everything resolves at the root.
    */
-  base: process.env.BASE_PATH ?? '/SPEN/',
+  base: process.env.BASE_PATH ?? '/spens/',
   plugins: [
     react(),
     VitePWA({

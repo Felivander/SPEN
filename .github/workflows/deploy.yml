@@ -34,11 +34,12 @@ jobs:
 
       - run: npm test
 
-      # `base` defaults to /SPEN/ in vite.config.ts, which is where Pages
-      # serves this repo. Override BASE_PATH here if the repo is renamed.
-      - run: npm run build
+      - id: pages
+        uses: actions/configure-pages@v5
 
-      - uses: actions/configure-pages@v5
+      - run: npm run build
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}/
 
       - uses: actions/upload-pages-artifact@v3
         with:

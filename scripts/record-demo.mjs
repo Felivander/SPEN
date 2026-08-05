@@ -191,7 +191,7 @@ async function run() {
     hasTouch: true,
   })
   const hiResPage = await hiResContext.newPage()
-  await hiResPage.goto('http://localhost:5173/SPEN/')
+  await hiResPage.goto('http://localhost:5173/spens/')
   await hiResPage.waitForLoadState('networkidle')
 
   // Set the exact localStorage key used by the app!
@@ -260,7 +260,7 @@ async function run() {
       hasTouch: true,
     })
     const p = await ctx.newPage()
-    await p.goto('http://localhost:5173/SPEN/')
+    await p.goto('http://localhost:5173/spens/')
     await p.waitForLoadState('networkidle')
     await p.evaluate((data) => {
       localStorage.setItem('xpenz.movements.v1', JSON.stringify(data))

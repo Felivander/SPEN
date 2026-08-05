@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://felivander.github.io/SPEN/"><img src="https://img.shields.io/badge/Demo-Probar_Spens-orange?style=for-the-badge&logo=pwa" alt="Demo en Vivo" /></a>
+  <a href="https://felivander.github.io/spens/"><img src="https://img.shields.io/badge/Demo-Probar_Spens-orange?style=for-the-badge&logo=pwa" alt="Demo en Vivo" /></a>
   <a href="#-instalar-en-el-celular"><img src="https://img.shields.io/badge/App-Instalar_PWA-black?style=for-the-badge&logo=apple" alt="PWA" /></a>
 </p>
 
@@ -69,7 +69,7 @@ npm run build
 
 ## 📲 Instalar en el Celular
 
-1. Entrá a **[https://felivander.github.io/SPEN/](https://felivander.github.io/SPEN/)** desde tu celular.
+1. Entrá a **[https://felivander.github.io/spens/](https://felivander.github.io/spens/)** desde tu celular.
 2. En Safari/Chrome: **Compartir** ➔ **Agregar a pantalla de inicio**.
 3. Abrilo como una App nativa sin barras de navegador.
 
